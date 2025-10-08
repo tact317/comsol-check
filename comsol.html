@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMSOL設定管理チェックリスト</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 320px;
+            background: #ffffff;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+        }
+
+        .header {
+            background: #2c5aa0;
+            color: white;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .category {
+            border-bottom: 1px solid #eee;
+        }
+
+        .category-header {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .category-header:hover {
+            background: #e9ecef;
+        }
+
+        .category-header.active {
+            background: #e3f2fd;
+            color: #1976d2;
+            font-weight: 600;
+        }
+
+        .category-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-icon {
+            margin-left: auto;
+            transition: transform 0.3s;
+            font-size: 14px;
+        }
+
+        .toggle-icon.expanded {
+            transform: rotate(90deg);
+        }
+
+        .subcategories {
+            display: none;
+            background: #fafafa;
+        }
+
+        .subcategories.show {
+            display: block;
+        }
+
+        .subcategory {
+            padding: 12px 20px 12px 56px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+            border-left: 3px solid transparent;
+        }
+
+        .subcategory:hover {
+            background: #f0f0f0;
+        }
+
+        .subcategory.active {
+            background: #e3f2fd;
+            border-left-color: #1976d2;
+            color: #1976d2;
+            font-weight: 500;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+
+        .content-header {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .content-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c5aa0;
+            margin-bottom: 8px;
+        }
+
+        .content-description {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .settings-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .setting-group {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .setting-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .setting-label {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            transition: background 0.2s;
+        }
+
+        .check-item:hover {
+            background: #f8f9fa;
+        }
+
+        .check-item input[type="checkbox"] {
+            margin-right: 12px;
+            margin-top: 3px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .check-item label {
+            cursor: pointer;
+            flex: 1;
+            line-height: 1.5;
+        }
+
+        .check-item.checked {
+            background: #e8f5e9;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-top: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #2c5aa0;
+        }
+
+        textarea.input-field {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e0e0e0;
+            z-index: 1000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2c5aa0, #4caf50);
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        .stats {
+            background: white;
+            padding: 15px 20px;
+            border-top: 1px solid #ddd;
+            position: sticky;
+            bottom: 0;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .stat-label {
+            color: #666;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #2c5aa0;
+        }
+
+        .note-area {
+            margin-top: 10px;
+        }
+
+        .note-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="header">COMSOL設定管理</div>
+            
+            <div class="category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <div class="category-icon">📊</div>
+                    <span>グローバル定義</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="subcategories">
+                    <div class="subcategory" onclick="showContent('parameters')">Parameters</div>
+                    <div class="subcategory" onclick="showContent('variables')">Variables</div>
+                    <div class="subcategory" onclick="showContent('functions')">Functions</div>
+                </div>
+            </div>
+
+            <div class="category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <div class="category-icon">🔷</div>
+                    <span>ジオメトリ</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="subcategories">
+                    <div class="subcategory" onclick="showContent('geometry-basic')">基本形状</div>
+                    <div class="subcategory" onclick="showContent('geometry-boolean')">ブール演算</div>
+                    <div class="subcategory" onclick="showContent('geometry-dims')">寸法・配置</div>
+                </div>
+            </div>
+
+            <div class="category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <div class="category-icon">🎨</div>
+                    <span>材料</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="subcategories">
+                    <div class="subcategory" onclick="showContent('materials')">材料設定</div>
+                    <div class="subcategory" onclick="showContent('material-props')">材料物性</div>
+                </div>
+            </div>
+
+            <div class="category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <div class="category-icon">⚡</div>
+                    <span>物理</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="subcategories">
+                    <div class="subcategory" onclick="showContent('physics-type')">物理タイプ</div>
+                    <div class="subcategory" onclick="showContent('boundary-conditions')">境界条件</div>
+                    <div class="subcategory" onclick="showContent('initial-values')">初期値</div>
+                </div>
+            </div>
+
+            <div class="category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <div class="category-icon">🔬</div>
+                    <span>メッシュ</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="subcategories">
+                    <div class="subcategory" onclick="showContent('mesh-size')">メッシュサイズ</div>
+                    <div class="subcategory" onclick="showContent('mesh-refinement')">メッシュ調整</div>
+                </div>
+            </div>
+
+            <div class="category">
+                <div class="category-header" onclick="toggleCategory(this)">
+                    <div class="category-icon">📈</div>
+                    <span>スタディ</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="subcategories">
+                    <div class="subcategory" onclick="showContent('study-type')">スタディタイプ</div>
+                    <div class="subcategory" onclick="showContent('solver-settings')">ソルバー設定</div>
+                    <div class="subcategory" onclick="showContent('convergence')">収束条件</div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-row">
+                    <span class="stat-label">チェック済み</span>
+                    <span class="stat-value"><span id="checked-count">0</span> / <span id="total-count">0</span></span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">進捗率</span>
+                    <span class="stat-value"><span id="progress-percent">0</span>%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content" id="main-content">
+            <div class="content-header">
+                <div class="content-title">COMSOL設定管理チェックリスト</div>
+                <div class="content-description">左側のメニューから項目を選択して、各設定を確認・記録してください</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+    </div>
+
+    <script>
+        const contentData = {
+            'parameters': {
+                title: 'Parameters（パラメータ）',
+                description: 'グローバルパラメータの設定を確認',
+                items: [
+                    { label: 'すべてのパラメータ名が統一されている', input: 'text', placeholder: 'パラメータリスト（例：L=10[mm], R=5[mm]）' },
+                    { label: 'パラメータの単位が正しく設定されている', input: 'text', placeholder: '単位の確認内容' },
+                    { label: 'パラメータの値が意図した範囲内である', input: 'text', placeholder: '値の範囲（例：0<R<100）' },
+                    { label: 'パラメータの命名規則が統一されている', input: 'textarea', placeholder: '命名規則の説明' }
+                ]
+            },
+            'variables': {
+                title: 'Variables（変数）',
+                description: 'グローバル変数の定義を確認',
+                items: [
+                    { label: '変数の定義式が全ファイルで一致している', input: 'textarea', placeholder: '変数定義リスト' },
+                    { label: '変数の評価順序が適切である', input: 'text', placeholder: '評価順序の確認' },
+                    { label: '循環参照がない', input: 'text', placeholder: '依存関係チェック' }
+                ]
+            },
+            'functions': {
+                title: 'Functions（関数）',
+                description: 'ユーザー定義関数の確認',
+                items: [
+                    { label: '関数の定義が全ファイルで一致している', input: 'textarea', placeholder: '関数リスト' },
+                    { label: '補間関数のデータソースが正しい', input: 'text', placeholder: 'データソースのパス' },
+                    { label: '解析関数の数式が正しい', input: 'textarea', placeholder: '数式の確認' }
+                ]
+            },
+            'geometry-basic': {
+                title: 'ジオメトリ - 基本形状',
+                description: '基本的なジオメトリ形状の確認',
+                items: [
+                    { label: '形状の寸法がパラメータで定義されている', input: 'text', placeholder: '使用パラメータ' },
+                    { label: '座標系が統一されている', input: 'text', placeholder: '座標系（例：Cartesian, Cylindrical）' },
+                    { label: '作業平面の設定が一致している', input: 'text', placeholder: '作業平面の確認' },
+                    { label: 'スケッチの拘束条件が適切である', input: 'textarea', placeholder: '拘束条件リスト' }
+                ]
+            },
+            'geometry-boolean': {
+                title: 'ジオメトリ - ブール演算',
+                description: 'ブール演算の設定確認',
+                items: [
+                    { label: 'Union/Intersection/Differenceの順序が正しい', input: 'textarea', placeholder: '演算順序' },
+                    { label: '形状のラベリングが統一されている', input: 'text', placeholder: 'ラベル命名規則' },
+                    { label: 'Form Union/Assembly の設定が一致している', input: 'text', placeholder: '設定内容' }
+                ]
+            },
+            'geometry-dims': {
+                title: 'ジオメトリ - 寸法・配置',
+                description: '寸法と配置の確認',
+                items: [
+                    { label: 'すべての寸法がパラメトリックである', input: 'text', placeholder: '固定値の有無' },
+                    { label: '配列パターンの設定が一致している', input: 'text', placeholder: '配列設定' },
+                    { label: '対称条件が適切に設定されている', input: 'text', placeholder: '対称条件' }
+                ]
+            },
+            'materials': {
+                title: '材料設定',
+                description: '材料の割り当て確認',
+                items: [
+                    { label: 'すべてのドメインに材料が割り当てられている', input: 'textarea', placeholder: 'ドメインと材料の対応' },
+                    { label: '材料名が統一されている', input: 'text', placeholder: '材料名リスト' },
+                    { label: '材料ライブラリのバージョンが一致している', input: 'text', placeholder: 'バージョン情報' }
+                ]
+            },
+            'material-props': {
+                title: '材料物性',
+                description: '材料物性値の確認',
+                items: [
+                    { label: '密度が正しく設定されている', input: 'text', placeholder: '密度の値' },
+                    { label: '熱伝導率が正しく設定されている', input: 'text', placeholder: '熱伝導率の値' },
+                    { label: '電気伝導率が正しく設定されている', input: 'text', placeholder: '電気伝導率の値' },
+                    { label: '温度依存性が適切に設定されている', input: 'textarea', placeholder: '温度依存式' },
+                    { label: 'カスタム物性値が全ファイルで一致している', input: 'textarea', placeholder: 'カスタム物性リスト' }
+                ]
+            },
+            'physics-type': {
+                title: '物理タイプ',
+                description: '物理インターフェースの確認',
+                items: [
+                    { label: '物理インターフェースの種類が一致している', input: 'text', placeholder: '物理タイプ（例：mf, ec）' },
+                    { label: '多物理連成の設定が正しい', input: 'textarea', placeholder: '連成設定' },
+                    { label: '物理フィールド変数名が統一されている', input: 'text', placeholder: '変数名リスト' }
+                ]
+            },
+            'boundary-conditions': {
+                title: '境界条件',
+                description: '境界条件の設定確認',
+                items: [
+                    { label: 'すべての境界に条件が設定されている', input: 'textarea', placeholder: '境界リスト' },
+                    { label: '境界条件の値が正しい', input: 'textarea', placeholder: '境界条件の詳細' },
+                    { label: '境界選択が正しい（境界番号の確認）', input: 'text', placeholder: '境界番号リスト' },
+                    { label: '周期境界条件が適切に設定されている', input: 'text', placeholder: '周期境界の設定' },
+                    { label: '対称境界条件が適切に設定されている', input: 'text', placeholder: '対称境界の設定' }
+                ]
+            },
+            'initial-values': {
+                title: '初期値',
+                description: '初期値の設定確認',
+                items: [
+                    { label: '初期値が物理的に妥当である', input: 'textarea', placeholder: '初期値の詳細' },
+                    { label: '過渡解析の初期時刻が正しい', input: 'text', placeholder: '初期時刻' },
+                    { label: '初期値の与え方が統一されている', input: 'text', placeholder: '設定方法' }
+                ]
+            },
+            'mesh-size': {
+                title: 'メッシュサイズ',
+                description: 'メッシュサイズの設定確認',
+                items: [
+                    { label: 'グローバルメッシュサイズが統一されている', input: 'text', placeholder: 'メッシュサイズ（例：Fine, Normal）' },
+                    { label: '最大要素サイズが適切である', input: 'text', placeholder: '最大サイズ' },
+                    { label: '最小要素サイズが適切である', input: 'text', placeholder: '最小サイズ' },
+                    { label: '要素成長率が適切である', input: 'text', placeholder: '成長率' }
+                ]
+            },
+            'mesh-refinement': {
+                title: 'メッシュ調整',
+                description: 'メッシュの詳細設定確認',
+                items: [
+                    { label: '境界層メッシュの設定が一致している', input: 'textarea', placeholder: '境界層メッシュ設定' },
+                    { label: '局所的なメッシュ細分化が統一されている', input: 'textarea', placeholder: '細分化領域' },
+                    { label: 'メッシュ品質が十分である（歪み度）', input: 'text', placeholder: '品質指標' }
+                ]
+            },
+            'study-type': {
+                title: 'スタディタイプ',
+                description: 'スタディの種類と設定',
+                items: [
+                    { label: 'スタディタイプが統一されている', input: 'text', placeholder: 'スタディタイプ（例：Stationary, Time Dependent）' },
+                    { label: 'パラメトリックスイープの範囲が正しい', input: 'textarea', placeholder: 'パラメータ範囲' },
+                    { label: '時間ステップ設定が適切である', input: 'text', placeholder: '時間ステップ' },
+                    { label: '周波数範囲が正しい（周波数応答解析）', input: 'text', placeholder: '周波数範囲' }
+                ]
+            },
+            'solver-settings': {
+                title: 'ソルバー設定',
+                description: 'ソルバーの詳細設定',
+                items: [
+                    { label: 'ソルバータイプが統一されている', input: 'text', placeholder: 'ソルバータイプ' },
+                    { label: '線形ソルバーの設定が一致している', input: 'text', placeholder: '線形ソルバー設定' },
+                    { label: '非線形ソルバーの設定が一致している', input: 'text', placeholder: '非線形ソルバー設定' },
+                    { label: 'ダンピング係数が適切である', input: 'text', placeholder: 'ダンピング係数' }
+                ]
+            },
+            'convergence': {
+                title: '収束条件',
+                description: '収束判定の設定確認',
+                items: [
+                    { label: '相対許容誤差が統一されている', input: 'text', placeholder: '相対許容誤差' },
+                    { label: '絶対許容誤差が統一されている', input: 'text', placeholder: '絶対許容誤差' },
+                    { label: '最大反復回数が適切である', input: 'text', placeholder: '最大反復回数' },
+                    { label: '収束判定基準が統一されている', input: 'textarea', placeholder: '収束判定基準の詳細' }
+                ]
+            }
+        };
+
+        let checkStates = {};
+        let inputValues = {};
+
+        function initializeData() {
+            for (let key in contentData) {
+                checkStates[key] = contentData[key].items.map(() => false);
+                inputValues[key] = contentData[key].items.map(() => '');
+            }
+        }
+
+        function toggleCategory(element) {
+            const subcategories = element.nextElementSibling;
+            const icon = element.querySelector('.toggle-icon');
+            
+            subcategories.classList.toggle('show');
+            icon.classList.toggle('expanded');
+        }
+
+        function showContent(contentId) {
+            document.querySelectorAll('.subcategory').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const data = contentData[contentId];
+            const mainContent = document.getElementById('main-content');
+            
+            let html = `
+                <div class="content-header">
+                    <div class="content-title">${data.title}</div>
+                    <div class="content-description">${data.description}</div>
+                </div>
+                <div class="settings-panel">
+            `;
+
+            data.items.forEach((item, index) => {
+                const isChecked = checkStates[contentId][index];
+                const value = inputValues[contentId][index];
+                
+                html += `
+                    <div class="setting-group">
+                        <div class="check-item ${isChecked ? 'checked' : ''}" id="check-${contentId}-${index}">
+                            <input type="checkbox" id="checkbox-${contentId}-${index}" 
+                                   ${isChecked ? 'checked' : ''}
+                                   onchange="toggleCheck('${contentId}', ${index})">
+                            <label for="checkbox-${contentId}-${index}">${item.label}</label>
+                        </div>
+                        ${item.input === 'textarea' ? 
+                            `<textarea class="input-field" placeholder="${item.placeholder}" 
+                                       oninput="saveInput('${contentId}', ${index}, this.value)">${value}</textarea>` :
+                            `<input type="text" class="input-field" placeholder="${item.placeholder}" 
+                                    value="${value}" oninput="saveInput('${contentId}', ${index}, this.value)">`
+                        }
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            mainContent.innerHTML = html;
+        }
+
+        function toggleCheck(contentId, index) {
+            checkStates[contentId][index] = !checkStates[contentId][index];
+            const checkItem = document.getElementById(`check-${contentId}-${index}`);
+            
+            if (checkStates[contentId][index]) {
+                checkItem.classList.add('checked');
+            } else {
+                checkItem.classList.remove('checked');
+            }
+            
+            updateStats();
+        }
+
+        function saveInput(contentId, index, value) {
+            inputValues[contentId][index] = value;
+        }
+
+        function updateStats() {
+            let totalChecks = 0;
+            let completedChecks = 0;
+            
+            for (let key in checkStates) {
+                totalChecks += checkStates[key].length;
+                completedChecks += checkStates[key].filter(state => state).length;
+            }
+            
+            const percentage = totalChecks > 0 ? Math.round((completedChecks / totalChecks) * 100) : 0;
+            
+            document.getElementById('checked-count').textContent = completedChecks;
+            document.getElementById('total-count').textContent = totalChecks;
+            document.getElementById('progress-percent').textContent = percentage;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+        }
+
+        initializeData();
+        updateStats();
+    </script>
+</body>
+</html>
