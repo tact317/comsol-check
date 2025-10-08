@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>手書きノート</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    
+    #app { 
+      max-width: 1400px; 
+      margin: 0 auto; 
+      padding: 20px; 
+    }
+    
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    
+    .toolbar {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .tool-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    
+    .btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: white;
+      font-size: 14px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .btn:hover { 
+      background: #f0f0f0; 
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .btn.active { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white; 
+    }
+    
+    .color-picker {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .color-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 3px solid white;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .color-btn:hover { 
+      transform: scale(1.15); 
+    }
+    
+    .color-btn.active { 
+      border: 3px solid #333; 
+      box-shadow: 0 0 0 2px white, 0 0 0 4px #333;
+    }
+    
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .slider-group label {
+      font-size: 14px;
+      color: #666;
+      white-space: nowrap;
+    }
+    
+    input[type="range"] {
+      width: 120px;
+      cursor: pointer;
+      height: 6px;
+      background: #ddd;
+      border-radius: 3px;
+      outline: none;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    
+    .value-display {
+      min-width: 30px;
+      text-align: center;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .tabs-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+    }
+    
+    .tabs::-webkit-scrollbar {
+      height: 6px;
+    }
+    
+    .tabs::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    
+    .tabs::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 3px;
+    }
+    
+    .tab {
+      padding: 12px 24px;
+      background: white;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .tab:hover { 
+      background: #f8f9fa;
+      transform: translateY(-2px);
+    }
+    
+    .tab.active { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .tab-close {
+      margin-left: 8px;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    
+    .tab-close:hover {
+      opacity: 1;
+    }
+    
+    .canvas-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      overflow: hidden;
+      position: relative;
+    }
+    
+    canvas {
+      display: block;
+      touch-action: none;
+    }
+    
+    canvas.pen { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><circle cx="10" cy="10" r="2" fill="black"/></svg>') 10 10, crosshair; }
+    canvas.eraser { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><rect x="5" y="5" width="10" height="10" fill="white" stroke="black"/></svg>') 10 10, crosshair; }
+    canvas.line, canvas.rect, canvas.circle, canvas.arrow { cursor: crosshair; }
+    canvas.text { cursor: text; }
+    canvas.select { cursor: move; }
+    
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .undo-redo {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .separator { 
+      width: 2px; 
+      height: 40px; 
+      background: linear-gradient(to bottom, transparent, #ddd, transparent);
+      margin: 0 5px; 
+    }
+    
+    .zoom-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .zoom-control button {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: #f8f9fa;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.2s;
+    }
+    
+    .zoom-control button:hover {
+      background: #e9ecef;
+      transform: scale(1.1);
+    }
+    
+    .zoom-value {
+      min-width: 50px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    
+    .text-input-overlay {
+      position: absolute;
+      display: none;
+    }
+    
+    .text-input-overlay.active {
+      display: block;
+    }
+    
+    .text-input-overlay input {
+      border: 2px solid #667eea;
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 4px;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 768px) {
+      .tool-group {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="header">
+      <h1>📝 手書きノート</h1>
+      <div class="toolbar">
+        <div class="tool-group">
+          <button class="btn active" onclick="setTool('pen')" title="ペン">
+            <span>✏️</span><span>ペン</span>
+          </button>
+          <button class="btn" onclick="setTool('highlighter')" title="蛍光ペン">
+            <span>🖍️</span><span>蛍光</span>
+          </button>
+          <button class="btn" onclick="setTool('eraser')" title="消しゴム">
+            <span>🧹</span><span>消しゴム</span>
+          </button>
+        </div>
+        
+        <div class="separator"></div>
+        
+        <div class="tool-group">
+          <button class="btn" onclick="setTool('line')" title="直線">
+            <span>📏</span><span>直線</span>
+          </button>
+          <button class="btn" onclick="setTool('arrow')" title="矢印">
+            <span>➡️</span><span>矢印</span>
+          </button>
+          <button class="btn" onclick="setTool('rect')" title="四角形">
+            <span>▢</span><span>四角</span>
+          </button>
+          <button class="btn" onclick="setTool('circle')" title="円">
+            <span>○</span><span>円</span>
+          </button>
+          <button class="btn" onclick="setTool('text')" title="テキスト">
+            <span>T</span><span>文字</span>
+          </button>
+        </div>
+        
+        <div class="separator"></div>
+        
+        <div class="tool-group color-picker">
+          <div class="color-btn active" style="background: #000" onclick="setColor('#000')" title="黒"></div>
+          <div class="color-btn" style="background: #ff0000" onclick="setColor('#ff0000')" title="赤"></div>
+          <div class="color-btn" style="background: #0066ff" onclick="setColor('#0066ff')" title="青"></div>
+          <div class="color-btn" style="background: #00cc00" onclick="setColor('#00cc00')" title="緑"></div>
+          <div class="color-btn" style="background: #ffcc00" onclick="setColor('#ffcc00')" title="黄"></div>
+          <div class="color-btn" style="background: #ff00ff" onclick="setColor('#ff00ff')" title="紫"></div>
+          <div class="color-btn" style="background: #ff8800" onclick="setColor('#ff8800')" title="橙"></div>
+        </div>
+        
+        <div class="separator"></div>
+        
+        <div class="tool-group slider-group">
+          <label>太さ:</label>
+          <input type="range" min="1" max="30" value="3" oninput="setWidth(this.value)">
+          <span class="value-display" id="widthValue">3</span>
+        </div>
+        
+        <div class="separator"></div>
+        
+        <div class="tool-group slider-group">
+          <label>透明度:</label>
+          <input type="range" min="10" max="100" value="100" oninput="setOpacity(this.value)">
+          <span class="value-display" id="opacityValue">100</span>
+        </div>
+        
+        <div class="separator"></div>
+        
+        <div class="tool-group action-buttons">
+          <div class="undo-redo">
+            <button class="btn" onclick="undo()" title="元に戻す">↶</button>
+            <button class="btn" onclick="redo()" title="やり直し">↷</button>
+          </div>
+          <button class="btn" onclick="clearCanvas()" title="クリア">🗑️ クリア</button>
+          <button class="btn" onclick="downloadCanvas()" title="ダウンロード">💾 保存</button>
+        </div>
+        
+        <div class="separator"></div>
+        
+        <div class="zoom-control">
+          <button onclick="zoomOut()">−</button>
+          <span class="zoom-value" id="zoomValue">100%</span>
+          <button onclick="zoomIn()">+</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tabs-container">
+      <div class="tabs" id="tabs"></div>
+      <button class="btn" onclick="addPage()" style="margin-top: 10px;">
+        <span>+</span><span>新しいページ</span>
+      </button>
+    </div>
+    
+    <div class="canvas-container">
+      <canvas id="canvas"></canvas>
+      <div class="text-input-overlay" id="textInput">
+        <input type="text" placeholder="テキストを入力...">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let pages = [{ strokes: [], history: [], historyStep: -1 }];
+    let currentPage = 0;
+    let drawing = false;
+    let tool = 'pen';
+    let color = '#000';
+    let lineWidth = 3;
+    let opacity = 1;
+    let startX, startY;
+    let snapshot;
+    let zoom = 1;
+    let currentStroke = null;
+    
+    function resizeCanvas() {
+      const container = canvas.parentElement;
+      const w = container.clientWidth;
+      const h = Math.max(600, window.innerHeight - 300);
+      
+      if (canvas.width !== w || canvas.height !== h) {
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        tempCtx.drawImage(canvas, 0, 0);
+        
+        canvas.width = w;
+        canvas.height = h;
+        
+        ctx.drawImage(tempCanvas, 0, 0);
+        redraw();
+      }
+    }
+    
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    
+    function setTool(t) {
+      tool = t;
+      canvas.className = t;
+      document.querySelectorAll('.toolbar .btn').forEach(b => b.classList.remove('active'));
+      event.target.closest('.btn').classList.add('active');
+    }
+    
+    function setColor(c) {
+      color = c;
+      document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+    
+    function setWidth(w) {
+      lineWidth = w;
+      document.getElementById('widthValue').textContent = w;
+    }
+    
+    function setOpacity(o) {
+      opacity = o / 100;
+      document.getElementById('opacityValue').textContent = o;
+    }
+    
+    function clearCanvas() {
+      if (confirm('このページをクリアしますか？')) {
+        saveHistory();
+        pages[currentPage].strokes = [];
+        redraw();
+      }
+    }
+    
+    function addPage() {
+      pages.push({ strokes: [], history: [], historyStep: -1 });
+      currentPage = pages.length - 1;
+      updateTabs();
+      redraw();
+    }
+    
+    function switchPage(idx) {
+      if (idx < 0 || idx >= pages.length) return;
+      currentPage = idx;
+      updateTabs();
+      redraw();
+    }
+    
+    function deletePage(idx, e) {
+      e.stopPropagation();
+      if (pages.length === 1) {
+        alert('最後のページは削除できません');
+        return;
+      }
+      if (confirm(`ページ ${idx + 1} を削除しますか？`)) {
+        pages.splice(idx, 1);
+        if (currentPage >= pages.length) currentPage = pages.length - 1;
+        updateTabs();
+        redraw();
+      }
+    }
+    
+    function updateTabs() {
+      const tabsEl = document.getElementById('tabs');
+      tabsEl.innerHTML = pages.map((_, i) => 
+        `<button class="tab ${i === currentPage ? 'active' : ''}" onclick="switchPage(${i})">
+          📄 ページ ${i + 1}
+          ${pages.length > 1 ? `<span class="tab-close" onclick="deletePage(${i}, event)">×</span>` : ''}`
+      ).join('');
+    }
+    
+    function saveHistory() {
+      const page = pages[currentPage];
+      page.history = page.history.slice(0, page.historyStep + 1);
+      page.history.push(JSON.parse(JSON.stringify(page.strokes)));
+      page.historyStep++;
+      
+      if (page.history.length > 50) {
+        page.history.shift();
+        page.historyStep--;
+      }
+    }
+    
+    function undo() {
+      const page = pages[currentPage];
+      if (page.historyStep > 0) {
+        page.historyStep--;
+        page.strokes = JSON.parse(JSON.stringify(page.history[page.historyStep]));
+        redraw();
+      }
+    }
+    
+    function redo() {
+      const page = pages[currentPage];
+      if (page.historyStep < page.history.length - 1) {
+        page.historyStep++;
+        page.strokes = JSON.parse(JSON.stringify(page.history[page.historyStep]));
+        redraw();
+      }
+    }
+    
+    function zoomIn() {
+      zoom = Math.min(zoom + 0.1, 3);
+      updateZoom();
+    }
+    
+    function zoomOut() {
+      zoom = Math.max(zoom - 0.1, 0.5);
+      updateZoom();
+    }
+    
+    function updateZoom() {
+      document.getElementById('zoomValue').textContent = Math.round(zoom * 100) + '%';
+      redraw();
+    }
+    
+    function downloadCanvas() {
+      const link = document.createElement('a');
+      link.download = `note_page${currentPage + 1}_${Date.now()}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+    
+    function redraw() {
+      ctx.save();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.scale(zoom, zoom);
+      
+      pages[currentPage].strokes.forEach(stroke => {
+        ctx.globalAlpha = stroke.opacity;
+        ctx.strokeStyle = stroke.color;
+        ctx.fillStyle = stroke.color;
+        ctx.lineWidth = stroke.width;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        if (stroke.type === 'path') {
+          ctx.beginPath();
+          ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+          stroke.points.forEach(p => ctx.lineTo(p.x, p.y));
+          ctx.stroke();
+        } else if (stroke.type === 'line') {
+          ctx.beginPath();
+          ctx.moveTo(stroke.x1, stroke.y1);
+          ctx.lineTo(stroke.x2, stroke.y2);
+          ctx.stroke();
+        } else if (stroke.type === 'arrow') {
+          drawArrow(stroke.x1, stroke.y1, stroke.x2, stroke.y2);
+        } else if (stroke.type === 'rect') {
+          if (stroke.filled) {
+            ctx.fillRect(stroke.x, stroke.y, stroke.w, stroke.h);
+          } else {
+            ctx.strokeRect(stroke.x, stroke.y, stroke.w, stroke.h);
+          }
+        } else if (stroke.type === 'circle') {
+          ctx.beginPath();
+          ctx.arc(stroke.x, stroke.y, stroke.r, 0, Math.PI * 2);
+          if (stroke.filled) {
+            ctx.fill();
+          } else {
+            ctx.stroke();
+          }
+        } else if (stroke.type === 'text') {
+          ctx.font = `${stroke.size}px sans-serif`;
+          ctx.fillText(stroke.text, stroke.x, stroke.y);
+        }
+      });
+      
+      ctx.restore();
+    }
+    
+    function drawArrow(x1, y1, x2, y2) {
+      const angle = Math.atan2(y2 - y1, x2 - x1);
+      const headlen = 15;
+      
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6), y2 - headlen * Math.sin(angle - Math.PI / 6));
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - headlen * Math.cos(angle + Math.PI / 6), y2 - headlen * Math.sin(angle + Math.PI / 6));
+      ctx.stroke();
+    }
+    
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const touch = e.touches ? e.touches[0] : e;
+      return {
+        x: (touch.clientX - rect.left) / zoom,
+        y: (touch.clientY - rect.top) / zoom
+      };
+    }
+    
+    function startDraw(e) {
+      const pos = getPos(e);
+      startX = pos.x;
+      startY = pos.y;
+      
+      if (tool === 'text') {
+        const textInputDiv = document.getElementById('textInput');
+        const textInput = textInputDiv.querySelector('input');
+        textInputDiv.style.left = (e.clientX - canvas.getBoundingClientRect().left) + 'px';
+        textInputDiv.style.top = (e.clientY - canvas.getBoundingClientRect().top) + 'px';
+        textInputDiv.classList.add('active');
+        textInput.value = '';
+        textInput.focus();
+        
+        textInput.onkeydown = (ke) => {
+          if (ke.key === 'Enter') {
+            if (textInput.value.trim()) {
+              saveHistory();
+              pages[currentPage].strokes.push({
+                type: 'text',
+                text: textInput.value,
+                x: pos.x,
+                y: pos.y,
+                color: color,
+                opacity: opacity,
+                size: lineWidth * 5
+              });
+              redraw();
+            }
+            textInputDiv.classList.remove('active');
+          } else if (ke.key === 'Escape') {
+            textInputDiv.classList.remove('active');
+          }
+        };
+        return;
+      }
+      
+      drawing = true;
+      saveHistory();
+      
+      if (tool === 'pen' || tool === 'eraser' || tool === 'highlighter') {
+        currentStroke = {
+          type: 'path',
+          points: [pos],
+          color: tool === 'eraser' ? '#fff' : color,
+          width: tool === 'eraser' ? lineWidth * 2 : lineWidth,
+          opacity: tool === 'highlighter' ? 0.3 : (tool === 'eraser' ? 1 : opacity)
+        };
+        pages[currentPage].strokes.push(currentStroke);
+      } else {
+        snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      }
+    }
+    
+    function draw(e) {
+      if (!drawing) return;
+      e.preventDefault();
+      
+      const pos = getPos(e);
+      
+      if (tool === 'pen' || tool === 'eraser' || tool === 'highlighter') {
+        currentStroke.points.push(pos);
+        redraw();
+      } else {
+        ctx.putImageData(snapshot, 0, 0);
+        ctx.save();
+        ctx.scale(zoom, zoom);
+        ctx.globalAlpha = opacity;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lineWidth;
+        ctx.lineCap = 'round';
+        
+        if (tool === 'line') {
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(pos.x, pos.y);
+          ctx.stroke();
+        } else if (tool === 'arrow') {
+          drawArrow(startX, startY, pos.x, pos.y);
+        } else if (tool === 'rect') {
+          ctx.strokeRect(startX, startY, pos.x - startX, pos.y - startY);
+        } else if (tool === 'circle') {
+          const r = Math.sqrt(Math.pow(pos.x - startX, 2) + Math.pow(pos.y - startY, 2));
+          ctx.beginPath();
+          ctx.arc(startX, startY, r, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
+    
+    function endDraw(e) {
+      if (!drawing) return;
+      drawing = false;
+      
+      const pos = getPos(e);
+      
+      if (tool === 'line') {
+        pages[currentPage].strokes.push({
+          type: 'line',
+          x1: startX, y1: startY,
+          x2: pos.x, y2: pos.y,
+          color, width: lineWidth, opacity
+        });
+      } else if (tool === 'arrow') {
+        pages[currentPage].strokes.push({
+          type: 'arrow',
+          x1: startX, y1: startY,
+          x2: pos.x, y2: pos.y,
+          color, width: lineWidth, opacity
+        });
+      } else if (tool === 'rect') {
+        pages[currentPage].strokes.push({
+          type: 'rect',
+          x: startX, y: startY,
+          w: pos.x - startX, h: pos.y - startY,
+          color, width: lineWidth, opacity
+        });
+      } else if (tool === 'circle') {
+        const r = Math.sqrt(Math.pow(pos.x - startX, 2) + Math.pow(pos.y - startY, 2));
+        pages[currentPage].strokes.push({
+          type: 'circle',
+          x: startX, y: startY, r,
+          color, width: lineWidth, opacity
+        });
+      }
+      
+      redraw();
+      currentStroke = null;
+    }
+    
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('mouseout', endDraw);
+    
+    canvas.addEventListener('touchstart', startDraw);
+    canvas.addEventListener('touchmove', draw);
+    canvas.addEventListener('touchend', endDraw);
+    
+    updateTabs();
+    saveHistory();
+  </script>
+</body>
+</html>
