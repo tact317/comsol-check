@@ -9,7 +9,10 @@
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;background:#f3f6fb;color:#333}
 .container{display:flex;height:100vh}
 .sidebar{width:340px;background:#fff;border-right:1px solid #dfe3ea;overflow-y:auto;box-shadow:2px 0 5px rgba(0,0,0,.05)}
-.header{background:#1f4e79;color:#fff;padding:16px 18px;font-size:16px;font-weight:700}
+.header{background:#1f4e79;color:#fff;padding:16px 18px;font-size:16px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.header-actions{display:flex;gap:8px}
+.header-btn{background:#2c5aa0;border:1px solid #4a7bb8;color:#fff;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;transition:background .2s}
+.header-btn:hover{background:#3a6bb0}
 .modelroot{padding:10px 18px;color:#1f4e79;font-weight:700;border-bottom:1px solid #eef2f7}
 .category{border-bottom:1px solid #eef2f7}
 .category-header{padding:12px 18px;background:#f7f9fc;cursor:pointer;display:flex;align-items:center;transition:background .15s}
@@ -39,17 +42,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Hiragino Ka
 .small{font-size:12px;color:#8795a8}
 .hr{height:1px;background:#eef2f7;margin:10px 0}
 
-/* Table editor */
 .table-wrap{border:1px solid #e4e9f2;border-radius:8px;overflow:hidden;margin:8px 0;background:#fff}
 .table-head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f7f9fc;border-bottom:1px solid #e4e9f2}
 .table-title{font-weight:700;color:#2c5aa0}
-.table-actions button{border:1px solid #2c5aa0;background:#2c5aa0;color:#fff;font-size:12px;padding:6px 10px;border-radius:6px;cursor:pointer}
+.table-actions button{border:1px solid #2c5aa0;background:#2c5aa0;color:#fff;font-size:12px;padding:6px 10px;border-radius:6px;cursor:pointer;margin-left:4px}
+.table-actions button:hover{background:#3a6bb0}
 .table{width:100%;border-collapse:collapse}
 .table th,.table td{border-bottom:1px solid #eef2f7;padding:8px 10px;font-size:13px;vertical-align:top}
 .table th{background:#fafcff;text-align:left;color:#556}
 .table td input,.table td textarea,.table td select{width:100%;padding:6px;border:1px solid #d9e0ea;border-radius:6px;font-size:13px;font-family:Consolas,Monaco,monospace}
 .table td textarea{min-height:44px;resize:vertical}
 .row-del{cursor:pointer;border:none;background:transparent;font-size:18px;line-height:1;color:#b00020}
+.row-del:hover{color:#d32f2f}
 .switch{position:relative;display:inline-block;width:38px;height:22px}
 .switch input{display:none}
 .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#cdd7e6;transition:.2s;border-radius:22px}
@@ -57,27 +61,53 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Hiragino Ka
 input:checked + .slider{background:#2c5aa0}
 input:checked + .slider:before{transform:translateX(16px)}
 
-/* Selection chips */
 .chips{display:flex;gap:6px;flex-wrap:wrap;border:1px solid #d9e0ea;border-radius:6px;padding:6px}
 .chip{background:#eef5ff;color:#1f4e79;border-radius:12px;padding:3px 8px;font-size:12px}
 .chips input{border:none;outline:none;min-width:120px}
 
-/* Footer stats */
 .stats{background:#fff;padding:12px 16px;border-top:1px solid #dfe3ea;position:sticky;bottom:0}
 .stat-row{display:flex;justify-content:space-between;font-size:12px}
 .progress-bar{position:fixed;bottom:0;left:0;right:0;height:4px;background:#e0e6ef;z-index:1000}
 .progress-fill{height:100%;background:linear-gradient(90deg,#1f4e79,#4caf50);transition:width .25s;width:0%}
+
+.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.modal-content{background:#fff;border-radius:12px;padding:24px;max-width:500px;width:90%;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.modal-title{font-size:18px;font-weight:700;color:#1f4e79;margin-bottom:16px}
+.modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+.btn{padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px;border:none}
+.btn-primary{background:#2c5aa0;color:#fff}
+.btn-primary:hover{background:#3a6bb0}
+.btn-secondary{background:#e0e6ef;color:#333}
+.btn-secondary:hover{background:#d0d8e5}
+
+.toast{position:fixed;top:20px;right:20px;background:#2c5aa0;color:#fff;padding:12px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:3000;display:none;animation:slideIn .3s ease}
+.toast.show{display:block}
+@keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+@media print{
+  .sidebar,.header-actions,.progress-bar,.table-actions button,.row-del{display:none!important}
+  .container{display:block;height:auto}
+  .main-content{padding:0;display:block}
+  .details{max-width:100%;min-width:100%}
+  .panel{page-break-inside:avoid;box-shadow:none;border:1px solid #ccc}
+  body{background:#fff}
+}
 </style>
 </head>
 <body>
 <div class="container">
-
-  <!-- Sidebar -->
   <div class="sidebar">
-    <div class="header">Model Builder</div>
+    <div class="header">
+      <span>Model Builder</span>
+      <div class="header-actions">
+        <button class="header-btn" onclick="exportJSON()" title="JSONでエクスポート">💾</button>
+        <button class="header-btn" onclick="importJSON()" title="JSONをインポート">📂</button>
+        <button class="header-btn" onclick="exportPDF()" title="PDFで出力">📄</button>
+      </div>
+    </div>
     <div class="modelroot">モデル（Model 1）</div>
 
-    <!-- Global Definitions -->
     <div class="category">
       <div class="category-header" onclick="toggleCategory(this)">
         <div class="category-icon">📊</div><span>グローバル定義（Global Definitions）</span><span class="toggle-icon">▶</span>
@@ -89,7 +119,6 @@ input:checked + .slider:before{transform:translateX(16px)}
       </div>
     </div>
 
-    <!-- Component -->
     <div class="category">
       <div class="category-header" onclick="toggleCategory(this)">
         <div class="category-icon">🧩</div><span>コンポーネント 1（comp1）</span><span class="toggle-icon">▶</span>
@@ -102,7 +131,6 @@ input:checked + .slider:before{transform:translateX(16px)}
       </div>
     </div>
 
-    <!-- Study -->
     <div class="category">
       <div class="category-header" onclick="toggleCategory(this)">
         <div class="category-icon">📈</div><span>スタディ（Study）</span><span class="toggle-icon">▶</span>
@@ -113,7 +141,6 @@ input:checked + .slider:before{transform:translateX(16px)}
       </div>
     </div>
 
-    <!-- Results -->
     <div class="category">
       <div class="category-header" onclick="toggleCategory(this)">
         <div class="category-icon">🧪</div><span>結果（Results）</span><span class="toggle-icon">▶</span>
@@ -130,13 +157,16 @@ input:checked + .slider:before{transform:translateX(16px)}
     </div>
   </div>
 
-  <!-- Main -->
   <div class="main-content">
     <div class="view-placeholder">（ビュー領域 / 参考：COMSOLのグラフィックス）</div>
     <div class="details" id="main">
       <div class="panel">
         <div class="panel-hd"><div class="panel-title">COMSOL設定管理（COMSOL風）</div></div>
-        <div class="panel-bd small">左のツリーからノードを選択すると、右側に「Settings」風の編集UIが表示されます。ブロックの <b>Active</b> トグル、(tag) 自動採番、Selectionチップ、Unit列、Studyのステップ、ResultsのPlot Group/Dataset などを実装しています。</div>
+        <div class="panel-bd small">
+          左のツリーからノードを選択すると、右側に「Settings」風の編集UIが表示されます。<br>
+          <b>データ保存：</b>ヘッダーの💾ボタンでJSONファイルをダウンロード、📂ボタンで読み込み、📄ボタンでPDF出力できます。<br>
+          <b>自動保存：</b>ブラウザに自動的に保存されます（同じブラウザで開けば復元されます）。
+        </div>
       </div>
     </div>
   </div>
@@ -144,22 +174,30 @@ input:checked + .slider:before{transform:translateX(16px)}
 
 <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
 
+<div class="modal" id="import-modal">
+  <div class="modal-content">
+    <div class="modal-title">JSONファイルをインポート</div>
+    <input type="file" id="file-input" accept=".json" style="width:100%;padding:10px;border:1px solid #d9e0ea;border-radius:6px">
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">キャンセル</button>
+      <button class="btn btn-primary" onclick="loadJSONFile()">読み込み</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-/* ================================
-   タグ自動採番
-================================ */
 const nextId = {
   param:1, var:1, fn:1,
-  blk:1, cyl:1, dif:1, arr:1, // geometry features（例）
+  blk:1, cyl:1, dif:1, arr:1,
   mat:1, bc:1, mesh:1,
   stp:1, dset:1, pg:1, plt:1,
   mfh:1, ec:1, ht:1
 };
 function newTag(prefix){ return prefix + (nextId[prefix]++); }
 
-/* ================================
-   進捗（チェック項目）
-================================ */
 let checkStates = {}, inputValues = {};
 function initChecks(id, items=[]){
   checkStates[id] = items.map(()=>false);
@@ -180,9 +218,6 @@ function updateStats(){
   document.getElementById('progress-fill').style.width=p+'%';
 }
 
-/* ================================
-   Selection chips
-================================ */
 function parseRanges(str){
   const out=[];
   (str||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(tok=>{
@@ -198,75 +233,59 @@ function chipsHTML(values, onChange){
   const id = 'chips-'+Math.random().toString(36).slice(2);
   setTimeout(()=>{
     const input = document.querySelector(`#${id}`);
-    input.addEventListener('change', e=>{
+    if(input) input.addEventListener('change', e=>{
       onChange(parseRanges(e.target.value));
-      showContent(currentId); // 再描画
+      showContent(currentId);
+      autoSave();
     });
   },0);
   return `<div class="chips">${nodes}<input id="${id}" placeholder="例：1,2,5-8"/></div>`;
 }
 
-/* ================================
-   データモデル
-================================ */
 const model = {
   global:{
-    parameters:[], // {tag,name,expr,unit,desc}
+    parameters:[],
     variables:[],
-    functions:[]   // {tag,fname,args,expr,unit,type}
+    functions:[]
   },
   comp1:{
-    geometry:{ features:[] }, // {tag,type,name,params:[]}
-    materials:[], // {tag,name,active:true, selection:[], props:[]}
-    physics:[],   // {tag,name,active:true,type, selection:[], params:[]}
-    mesh:{ features:[] } // {tag,name,type,active,selection:[], params:[]}
+    geometry:{ features:[] },
+    materials:[],
+    physics:[],
+    mesh:{ features:[] }
   },
   study:{
     tag:'std1', name:'Study 1',
-    steps:[], // {tag,type,active,params:[], notes:''}
-    solver:[ // simple sheet
+    steps:[],
+    solver:[
       {type:'Linear/Nonlinear', lin:'', nonlin:'', precond:'', rel:'', abs:'', maxit:''}
     ]
   },
   results:{
-    datasets:[],    // {tag,name,fromStudy:'std1',note:''}
-    plotGroups:[],  // {tag,name,datasetTag,plots:[{tag,type,selection:[],expr,unit,note}]}
-    derived:[]      // {tag,name,type,selection:[],expr,note}
+    datasets:[],
+    plotGroups:[],
+    derived:[]
   }
 };
 
-/* ====== 初期ノード（サンプル） ====== */
 function seed(){
-  // Parameters sample
   model.global.parameters.push({tag:newTag('param'),name:'L',expr:'10',unit:'mm',desc:'長さ'});
   model.global.variables.push({tag:newTag('var'),name:'area',expr:'L^2',unit:'mm^2',note:''});
   model.global.functions.push({tag:newTag('fn'),fname:'f1',args:'x',expr:'sin(x)',unit:'',type:'Analytic'});
-
-  // Geometry
   model.comp1.geometry.features.push({tag:newTag('blk'),type:'Block',name:'Block 1',params:[
     {k:'Lx',v:'L',u:'mm'}, {k:'Ly',v:'L',u:'mm'}, {k:'H',v:'L',u:'mm'}
   ]});
-
-  // Materials
   model.comp1.materials.push({tag:newTag('mat'),name:'Material 1 – AIR',active:true,selection:[1],props:[
     {prop:'rho',val:'1.2',unit:'kg/m^3'}
   ]});
-
-  // Physics
   model.comp1.physics.push({tag:'mfh'+(nextId.mfh++),name:'Magnetic Fields',type:'mfh',active:true,selection:[11,12],params:[]});
-
-  // Mesh
   model.comp1.mesh.features.push({tag:newTag('mesh'),name:'Size',type:'Size',active:true,selection:[],params:[
     {k:'最大要素',v:'L/5'},{k:'最小要素',v:'L/50'}
   ]});
-
-  // Study steps
   model.study.steps.push({tag:newTag('stp'),type:'Stationary',active:true,params:[],notes:''});
   model.study.steps.push({tag:newTag('stp'),type:'Parametric Sweep',active:true,params:[
     {k:'Parameter',v:'L'}, {k:'Range',v:'range(5[mm],1[mm],15[mm])'}
   ],notes:''});
-
-  // Results
   const d1 = {tag:newTag('dset'),name:'Solution 1',fromStudy:model.study.tag,note:''};
   model.results.datasets.push(d1);
   const pg1 = {tag:newTag('pg'),name:'3D Plot Group 1',datasetTag:d1.tag,plots:[
@@ -275,11 +294,100 @@ function seed(){
   model.results.plotGroups.push(pg1);
   model.results.derived.push({tag:newTag('plt'),name:'Line Average 1',type:'Line Average',selection:[21,22],expr:'mf.Bz',note:''});
 }
-seed();
 
-/* ================================
-   レンダリング
-================================ */
+// 自動保存・復元
+function autoSave(){
+  try{
+    const data = JSON.stringify({model, nextId});
+    localStorage.setItem('comsol_model', data);
+  }catch(e){
+    console.warn('Auto-save failed:', e);
+  }
+}
+
+function autoLoad(){
+  try{
+    const data = localStorage.getItem('comsol_model');
+    if(data){
+      const parsed = JSON.parse(data);
+      Object.assign(model, parsed.model);
+      Object.assign(nextId, parsed.nextId);
+      showToast('前回のデータを復元しました');
+      return true;
+    }
+  }catch(e){
+    console.warn('Auto-load failed:', e);
+  }
+  return false;
+}
+
+// JSONエクスポート
+function exportJSON(){
+  const data = JSON.stringify({model, nextId}, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `comsol_model_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('JSONファイルをダウンロードしました');
+}
+
+// JSONインポート
+function importJSON(){
+  document.getElementById('import-modal').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('import-modal').classList.remove('show');
+}
+
+function loadJSONFile(){
+  const file = document.getElementById('file-input').files[0];
+  if(!file){
+    alert('ファイルを選択してください');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const parsed = JSON.parse(e.target.result);
+      Object.assign(model, parsed.model);
+      Object.assign(nextId, parsed.nextId);
+      closeModal();
+      showContent(currentId || 'parameters');
+      autoSave();
+      showToast('データを読み込みました');
+    }catch(err){
+      alert('JSONの読み込みに失敗しました: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// PDF出力
+function exportPDF(){
+  showToast('PDF生成中...');
+  setTimeout(()=>{
+    window.print();
+    showToast('印刷ダイアログを開きました');
+  }, 100);
+}
+
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 3000);
+}
+
+// 初期化
+if(!autoLoad()){
+  seed();
+  autoSave();
+}
+
 let currentId = null;
 function toggleCategory(el){
   const subs = el.nextElementSibling;
@@ -304,7 +412,6 @@ function showContent(id){
   if(id==='derived')    return renderDerived(main);
 }
 
-/* ====== 共通UI小物 ====== */
 function panel(title,tag){ return `
   <div class="panel"><div class="panel-hd">
     <div class="panel-title">${title}${tag?` <span class="badge">(${tag})</span>`:''}</div>
@@ -315,26 +422,26 @@ function activeToggleHTML(obj, path){
   const id='sw-'+Math.random().toString(36).slice(2);
   setTimeout(()=>{
     const el=document.getElementById(id);
-    el.checked = !!obj.active;
-    el.onchange = ()=>{ obj.active = el.checked; };
+    if(el){
+      el.checked = !!obj.active;
+      el.onchange = ()=>{ obj.active = el.checked; autoSave(); };
+    }
   },0);
   return `<label class="small">Active</label> <label class="switch"><input id="${id}" type="checkbox"><span class="slider"></span></label>`;
 }
 function unitSplit(expr){
-  // "10[mm]" -> {v:"10",u:"mm"} / "L" -> {v:"L",u:""}
   const m = String(expr||'').match(/^(.*)\[(.+)\]\s*$/);
   return m? {v:m[1],u:m[2]} : {v:expr,u:''};
 }
 
-/* ====== Parameters / Variables / Functions ====== */
 function renderParameters(main){
-  initChecks('parameters',[{},{},{}]); // ダミー（進捗用）
+  initChecks('parameters',[{},{},{}]);
   let html = panel('Parameters（パラメータ）');
   html += tableSimple('parameters','param',
     [{key:'name',label:'Name'},{key:'expr',label:'Expression'},{key:'unit',label:'Unit'},{key:'desc',label:'Description'}],
     model.global.parameters,
-    (row,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); row.expr=p.v; if(!row.unit) row.unit=p.u; } row[k]=v; },
-    ()=> model.global.parameters.push({tag:newTag('param'),name:'',expr:'',unit:'',desc:''})
+    (row,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); row.expr=p.v; if(!row.unit) row.unit=p.u; } row[k]=v; autoSave(); },
+    ()=>{ model.global.parameters.push({tag:newTag('param'),name:'',expr:'',unit:'',desc:''}); autoSave(); }
   );
   html += panelEnd();
   main.innerHTML = html;
@@ -345,8 +452,8 @@ function renderVariables(main){
   html += tableSimple('variables','var',
     [{key:'name',label:'Name'},{key:'expr',label:'Expression'},{key:'unit',label:'Unit'},{key:'note',label:'Note'}],
     model.global.variables,
-    (r,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); r.expr=p.v; if(!r.unit) r.unit=p.u; } r[k]=v; },
-    ()=> model.global.variables.push({tag:newTag('var'),name:'',expr:'',unit:'',note:''})
+    (r,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); r.expr=p.v; if(!r.unit) r.unit=p.u; } r[k]=v; autoSave(); },
+    ()=>{ model.global.variables.push({tag:newTag('var'),name:'',expr:'',unit:'',note:''}); autoSave(); }
   );
   html += panelEnd();
   main.innerHTML = html;
@@ -357,8 +464,8 @@ function renderFunctions(main){
   html += tableSimple('functions','fn',
     [{key:'fname',label:'Name'},{key:'args',label:'Arguments'},{key:'expr',label:'Expression'},{key:'unit',label:'Unit'},{key:'type',label:'Type'}],
     model.global.functions,
-    (r,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); r.expr=p.v; if(!r.unit) r.unit=p.u; } r[k]=v; },
-    ()=> model.global.functions.push({tag:newTag('fn'),fname:'',args:'',expr:'',unit:'',type:'Analytic'})
+    (r,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); r.expr=p.v; if(!r.unit) r.unit=p.u; } r[k]=v; autoSave(); },
+    ()=>{ model.global.functions.push({tag:newTag('fn'),fname:'',args:'',expr:'',unit:'',type:'Analytic'}); autoSave(); }
   );
   html += panelEnd();
   main.innerHTML = html;
@@ -371,10 +478,9 @@ function tableSimple(contentId, prefix, columns, rows, onChange, onAdd){
       return `<td><input type="text" value="${val}" oninput="(${onChange})(modelPath('${contentId}')[${i}],'${c.key}',this.value)"></td>`;
     }).join('');
     return `<tr>${tds}<td class="small">${row.tag||''}</td>
-      <td><button class="row-del" onclick="modelPath('${contentId}').splice(${i},1);showContent('${contentId}')">🗑</button></td></tr>`;
+      <td><button class="row-del" onclick="modelPath('${contentId}').splice(${i},1);showContent('${contentId}');autoSave()">🗑</button></td></tr>`;
   }).join('') || `<tr><td colspan="${columns.length+2}" class="small">行がありません。「＋行追加」で追加。</td></tr>`;
   const addCall = `(${onAdd})();showContent('${contentId}')`;
-  // modelPath helper は eval避けのためswitchで実装
   return `
   <div class="table-wrap">
     <div class="table-head"><div class="table-title">${prefix.toUpperCase()}</div>
@@ -391,7 +497,6 @@ function modelPath(id){
   return [];
 }
 
-/* ====== Geometry ====== */
 function renderGeometry(main){
   let html = panel('Geometry（comp1/geom1）');
   html += `<div class="section-title">Features</div>
@@ -407,11 +512,11 @@ function renderGeometry(main){
       <div class="panel-hd"><div class="panel-title">${f.name} <span class="badge">(${f.tag})</span></div></div>
       <div class="panel-bd">
         <div class="section-title">Parameters</div>
-        ${tableKV(`geom-${idx}`, f.params, (k,v)=>{ f.params[k]=v; }, ( )=>{
+        ${tableKV(`geom-${idx}`, f.params, (i,v)=>{ f.params[i]=v; autoSave(); }, ()=>{
           f.params.push({k:'',v:'',u:''}); showContent('geometry');
         })}
         <div class="hr"></div>
-        <div class="small"><button class="row-del" onclick="model.comp1.geometry.features.splice(${idx},1);showContent('geometry')">🗑 削除</button></div>
+        <div class="small"><button class="row-del" onclick="model.comp1.geometry.features.splice(${idx},1);showContent('geometry');autoSave()">🗑 削除</button></div>
       </div></div>`;
   });
   html += panelEnd();
@@ -422,26 +527,26 @@ function addGeom(type){
   const tag = newTag(mapTag[type]||'blk');
   model.comp1.geometry.features.push({tag,type,name:`${type} ${nextId[mapTag[type]]-1}`,params:[]});
   showContent('geometry');
+  autoSave();
 }
 function tableKV(id, rows, onChange, onAdd){
   const body = (rows||[]).map((r,i)=>`
     <tr>
-      <td><input type="text" value="${r.k||''}" oninput="${onChange.name}(${i}, {k:this.value,v:'${r.v||''}',u:'${r.u||''}'})"></td>
-      <td><input type="text" value="${r.v||''}" oninput="${onChange.name}(${i}, {k:'${r.k||''}',v:this.value,u:'${r.u||''}'})"></td>
-      <td><input type="text" value="${r.u||''}" oninput="${onChange.name}(${i}, {k:'${r.k||''}',v:'${r.v||''}',u:this.value})"></td>
-      <td><button class="row-del" onclick="${id.split('-')[0]==='geom'?'model.comp1.geometry.features['+id.split('-')[1]+'].params.splice('+i+',1)':''};showContent('geometry')">🗑</button></td>
+      <td><input type="text" value="${r.k||''}" oninput="(${onChange})(${i}, {k:this.value,v:'${r.v||''}',u:'${r.u||''}'})"></td>
+      <td><input type="text" value="${r.v||''}" oninput="(${onChange})(${i}, {k:'${r.k||''}',v:this.value,u:'${r.u||''}'})"></td>
+      <td><input type="text" value="${r.u||''}" oninput="(${onChange})(${i}, {k:'${r.k||''}',v:'${r.v||''}',u:this.value})"></td>
+      <td><button class="row-del" onclick="${id.split('-')[0]==='geom'?'model.comp1.geometry.features['+id.split('-')[1]+'].params.splice('+i+',1)':''};showContent('geometry');autoSave()">🗑</button></td>
     </tr>
   `).join('') || `<tr><td colspan="4" class="small">行がありません。「＋行追加」で追加。</td></tr>`;
   return `
   <div class="table-wrap">
     <div class="table-head"><div class="table-title">Key / Value / Unit</div>
-      <div class="table-actions"><button onclick="${onAdd.name}()">＋行追加</button></div></div>
+      <div class="table-actions"><button onclick="(${onAdd})()">＋行追加</button></div></div>
     <table class="table"><thead><tr><th>Key</th><th>Value</th><th>Unit</th><th></th></tr></thead>
       <tbody>${body}</tbody></table>
   </div>`;
 }
 
-/* ====== Materials ====== */
 function renderMaterials(main){
   let html = panel('Materials（comp1/materials）');
   html += `<div class="table-actions" style="margin-bottom:8px">${addBtn('＋材料ブロック追加',"addMaterial()")}</div>`;
@@ -451,15 +556,15 @@ function renderMaterials(main){
         <div style="margin-left:auto">${activeToggleHTML(m)}</div>
       </div>
       <div class="panel-bd">
-        <div class="kv"><label>表示名</label><input value="${m.name}" oninput="model.comp1.materials[${idx}].name=this.value"></div>
+        <div class="kv"><label>表示名</label><input value="${m.name}" oninput="model.comp1.materials[${idx}].name=this.value;autoSave()"></div>
         <div class="kv"><label>Selection（ドメインID）</label><div>${chipsHTML(m.selection, v=>{m.selection=v;})}</div></div>
         <div class="section-title">カスタム物性</div>
         ${tableGeneric(`mat-${idx}`, ['物性名','値/式','単位','備考'],
           (m.props||[]).map(p=>[p.prop,p.val,p.unit,p.note||'']),
-          (r,c,val)=>{ const p=m.props[r]; if(!p) return; ['prop','val','unit','note'][c]=val; },
-          ()=>{ (m.props||=[]).push({prop:'',val:'',unit:'',note:''}); showContent('materials'); },
-          r=>{ m.props.splice(r,1); showContent('materials'); })}
-        <div class="small"><button class="row-del" onclick="model.comp1.materials.splice(${idx},1);showContent('materials')">🗑 ブロック削除</button></div>
+          (r,c,val)=>{ const p=m.props[r]; if(!p) return; const keys=['prop','val','unit','note']; p[keys[c]]=val; autoSave(); },
+          ()=>{ (m.props||=[]).push({prop:'',val:'',unit:'',note:''}); showContent('materials'); autoSave(); },
+          r=>{ m.props.splice(r,1); showContent('materials'); autoSave(); })}
+        <div class="small"><button class="row-del" onclick="model.comp1.materials.splice(${idx},1);showContent('materials');autoSave()">🗑 ブロック削除</button></div>
       </div></div>`;
   });
   html += panelEnd();
@@ -468,9 +573,9 @@ function renderMaterials(main){
 function addMaterial(){
   model.comp1.materials.push({tag:newTag('mat'),name:`Material ${nextId.mat-1}`,active:true,selection:[],props:[]});
   showContent('materials');
+  autoSave();
 }
 
-/* ====== Physics ====== */
 function renderPhysics(main){
   let html = panel('Physics（comp1）');
   html += `<div class="table-actions" style="margin-bottom:8px">
@@ -484,15 +589,15 @@ function renderPhysics(main){
         <div style="margin-left:auto">${activeToggleHTML(p)}</div>
       </div>
       <div class="panel-bd">
-        <div class="kv"><label>表示名</label><input value="${p.name}" oninput="model.comp1.physics[${idx}].name=this.value"></div>
+        <div class="kv"><label>表示名</label><input value="${p.name}" oninput="model.comp1.physics[${idx}].name=this.value;autoSave()"></div>
         <div class="kv"><label>Selection（領域/境界ID）</label><div>${chipsHTML(p.selection, v=>{p.selection=v;})}</div></div>
         <div class="section-title">パラメータ</div>
         ${tableGeneric(`phys-${idx}`, ['項目','値/式','単位','備考'],
           (p.params||[]).map(q=>[q.k,q.v,q.u||'',q.note||'']),
-          (r,c,val)=>{ const q=p.params[r]; ['k','v','u','note'][c]=val; },
-          ()=>{ (p.params||[]).push({k:'',v:'',u:'',note:''}); showContent('physics'); },
-          r=>{ p.params.splice(r,1); showContent('physics'); })}
-        <div class="small"><button class="row-del" onclick="model.comp1.physics.splice(${idx},1);showContent('physics')">🗑 ブロック削除</button></div>
+          (r,c,val)=>{ const q=p.params[r]; const keys=['k','v','u','note']; q[keys[c]]=val; autoSave(); },
+          ()=>{ (p.params||[]).push({k:'',v:'',u:'',note:''}); showContent('physics'); autoSave(); },
+          r=>{ p.params.splice(r,1); showContent('physics'); autoSave(); })}
+        <div class="small"><button class="row-del" onclick="model.comp1.physics.splice(${idx},1);showContent('physics');autoSave()">🗑 ブロック削除</button></div>
       </div></div>`;
   });
   html += panelEnd();
@@ -502,9 +607,9 @@ function addPhysics(type, name){
   const tag = type + (nextId[type]++);
   model.comp1.physics.push({tag,name,type,active:true,selection:[],params:[]});
   showContent('physics');
+  autoSave();
 }
 
-/* ====== Mesh ====== */
 function renderMesh(main){
   let html = panel('Mesh（comp1/mesh1）');
   html += `<div class="table-actions" style="margin-bottom:8px">
@@ -519,15 +624,15 @@ function renderMesh(main){
         <div style="margin-left:auto">${activeToggleHTML(f)}</div>
       </div>
       <div class="panel-bd">
-        <div class="kv"><label>Type</label><input value="${f.type}" oninput="model.comp1.mesh.features[${idx}].type=this.value"></div>
+        <div class="kv"><label>Type</label><input value="${f.type}" oninput="model.comp1.mesh.features[${idx}].type=this.value;autoSave()"></div>
         <div class="kv"><label>Selection（ID）</label><div>${chipsHTML(f.selection, v=>{f.selection=v;})}</div></div>
         <div class="section-title">Parameters</div>
         ${tableGeneric(`mesh-${idx}`, ['項目','値/式','備考'],
           (f.params||[]).map(q=>[q.k,q.v,q.note||'']),
-          (r,c,val)=>{ const q=f.params[r]; ['k','v','note'][c]=val; },
-          ()=>{ (f.params||[]).push({k:'',v:'',note:''}); showContent('mesh'); },
-          r=>{ f.params.splice(r,1); showContent('mesh'); })}
-        <div class="small"><button class="row-del" onclick="model.comp1.mesh.features.splice(${idx},1);showContent('mesh')">🗑 ブロック削除</button></div>
+          (r,c,val)=>{ const q=f.params[r]; const keys=['k','v','note']; q[keys[c]]=val; autoSave(); },
+          ()=>{ (f.params||[]).push({k:'',v:'',note:''}); showContent('mesh'); autoSave(); },
+          r=>{ f.params.splice(r,1); showContent('mesh'); autoSave(); })}
+        <div class="small"><button class="row-del" onclick="model.comp1.mesh.features.splice(${idx},1);showContent('mesh');autoSave()">🗑 ブロック削除</button></div>
       </div></div>`;
   });
   html += panelEnd();
@@ -536,9 +641,9 @@ function renderMesh(main){
 function addMesh(type){
   model.comp1.mesh.features.push({tag:newTag('mesh'),name:`${type} ${nextId.mesh-1}`,type,active:true,selection:[],params:[]});
   showContent('mesh');
+  autoSave();
 }
 
-/* ====== Study / Solver ====== */
 function renderStudy(main){
   let html = panel('Study 1（std1）', model.study.tag);
   html += `<div class="section-title">Steps</div>
@@ -555,19 +660,19 @@ function renderStudy(main){
       </div>
       <div class="panel-bd">
         ${s.type==='Time Dependent'?`
-          <div class="kv"><label>時間設定（tlist）</label><input value="${(s.tlist||'')}" oninput="model.study.steps[${idx}].tlist=this.value" placeholder="t0:dt:t1 / range()"/></div>`:''}
+          <div class="kv"><label>時間設定（tlist）</label><input value="${(s.tlist||'')}" oninput="model.study.steps[${idx}].tlist=this.value;autoSave()" placeholder="t0:dt:t1 / range()"/></div>`:''}
         ${s.type==='Frequency Domain'?`
-          <div class="kv"><label>周波数範囲</label><input value="${(s.frange||'')}" oninput="model.study.steps[${idx}].frange=this.value" placeholder="range(f0,df,f1)"/></div>`:''}
+          <div class="kv"><label>周波数範囲</label><input value="${(s.frange||'')}" oninput="model.study.steps[${idx}].frange=this.value;autoSave()" placeholder="range(f0,df,f1)"/></div>`:''}
         ${s.type==='Parametric Sweep'?`
-          <div class="kv"><label>Parameter</label><input value="${(s.param||'')}" oninput="model.study.steps[${idx}].param=this.value"></div>
-          <div class="kv"><label>Range/List</label><input value="${(s.range||'')}" oninput="model.study.steps[${idx}].range=this.value"></div>`:''}
+          <div class="kv"><label>Parameter</label><input value="${(s.param||'')}" oninput="model.study.steps[${idx}].param=this.value;autoSave()"></div>
+          <div class="kv"><label>Range/List</label><input value="${(s.range||'')}" oninput="model.study.steps[${idx}].range=this.value;autoSave()"></div>`:''}
         <div class="section-title">その他パラメータ</div>
         ${tableGeneric(`step-${idx}`, ['項目','値','備考'],
           (s.params||[]).map(q=>[q.k,q.v,q.note||'']),
-          (r,c,val)=>{ const q=s.params[r]; ['k','v','note'][c]=val; },
-          ()=>{ (s.params||[]).push({k:'',v:'',note:''}); showContent('study'); },
-          r=>{ s.params.splice(r,1); showContent('study'); })}
-        <div class="small"><button class="row-del" onclick="model.study.steps.splice(${idx},1);showContent('study')">🗑 Step削除</button></div>
+          (r,c,val)=>{ const q=s.params[r]; const keys=['k','v','note']; q[keys[c]]=val; autoSave(); },
+          ()=>{ (s.params||[]).push({k:'',v:'',note:''}); showContent('study'); autoSave(); },
+          r=>{ s.params.splice(r,1); showContent('study'); autoSave(); })}
+        <div class="small"><button class="row-del" onclick="model.study.steps.splice(${idx},1);showContent('study');autoSave()">🗑 Step削除</button></div>
       </div></div>`;
   });
   html += panelEnd();
@@ -576,47 +681,45 @@ function renderStudy(main){
 function addStep(type){
   model.study.steps.push({tag:newTag('stp'),type,active:true,params:[],notes:''});
   showContent('study');
+  autoSave();
 }
 function renderSolver(main){
   let html = panel('Solver / Convergence');
   html += tableGeneric('solver', ['タイプ','線形ソルバー','非線形','前処理','RelTol','AbsTol','MaxIt'],
     model.study.solver.map(s=>[s.type,s.lin,s.nonlin,s.precond,s.rel,s.abs,s.maxit]),
-    (r,c,v)=>{ const keys=['type','lin','nonlin','precond','rel','abs','maxit']; model.study.solver[r][keys[c]]=v; },
-    ()=>{ model.study.solver.push({type:'',lin:'',nonlin:'',precond:'',rel:'',abs:'',maxit:''}); showContent('solver'); },
-    r=>{ model.study.solver.splice(r,1); showContent('solver'); }
+    (r,c,v)=>{ const keys=['type','lin','nonlin','precond','rel','abs','maxit']; model.study.solver[r][keys[c]]=v; autoSave(); },
+    ()=>{ model.study.solver.push({type:'',lin:'',nonlin:'',precond:'',rel:'',abs:'',maxit:''}); showContent('solver'); autoSave(); },
+    r=>{ model.study.solver.splice(r,1); showContent('solver'); autoSave(); }
   );
   html += panelEnd();
   main.innerHTML=html;
 }
 
-/* ====== Results ====== */
 function renderResults(main){
   let html = panel('Results：Datasets / Plot Groups');
 
-  // Datasets
   html += `<div class="section-title">Datasets</div>
     <div class="table-actions" style="margin-bottom:8px">${addBtn('＋Dataset追加',"addDataset()")}</div>`;
   model.results.datasets.forEach((d,idx)=>{
     html += `<div class="panel">
       <div class="panel-hd"><div class="panel-title">${d.name} <span class="badge">(${d.tag})</span></div></div>
       <div class="panel-bd">
-        <div class="kv"><label>Name</label><input value="${d.name}" oninput="model.results.datasets[${idx}].name=this.value"></div>
-        <div class="kv"><label>From Study</label><input value="${d.fromStudy||model.study.tag}" oninput="model.results.datasets[${idx}].fromStudy=this.value"></div>
-        <div class="kv"><label>Note</label><input value="${d.note||''}" oninput="model.results.datasets[${idx}].note=this.value"></div>
-        <div class="small"><button class="row-del" onclick="model.results.datasets.splice(${idx},1);showContent('results')">🗑 Dataset削除</button></div>
+        <div class="kv"><label>Name</label><input value="${d.name}" oninput="model.results.datasets[${idx}].name=this.value;autoSave()"></div>
+        <div class="kv"><label>From Study</label><input value="${d.fromStudy||model.study.tag}" oninput="model.results.datasets[${idx}].fromStudy=this.value;autoSave()"></div>
+        <div class="kv"><label>Note</label><input value="${d.note||''}" oninput="model.results.datasets[${idx}].note=this.value;autoSave()"></div>
+        <div class="small"><button class="row-del" onclick="model.results.datasets.splice(${idx},1);showContent('results');autoSave()">🗑 Dataset削除</button></div>
       </div></div>`;
   });
 
-  // Plot Groups
   html += `<div class="section-title">Plot Groups</div>
     <div class="table-actions" style="margin-bottom:8px">${addBtn('＋Plot Group追加',"addPlotGroup()")}</div>`;
   model.results.plotGroups.forEach((pg,idx)=>{
     html += `<div class="panel">
       <div class="panel-hd"><div class="panel-title">${pg.name} <span class="badge">(${pg.tag})</span></div></div>
       <div class="panel-bd">
-        <div class="kv"><label>Name</label><input value="${pg.name}" oninput="model.results.plotGroups[${idx}].name=this.value"></div>
+        <div class="kv"><label>Name</label><input value="${pg.name}" oninput="model.results.plotGroups[${idx}].name=this.value;autoSave()"></div>
         <div class="kv"><label>Dataset</label>
-          <select onchange="model.results.plotGroups[${idx}].datasetTag=this.value">
+          <select onchange="model.results.plotGroups[${idx}].datasetTag=this.value;autoSave()">
             ${model.results.datasets.map(d=>`<option value="${d.tag}" ${pg.datasetTag===d.tag?'selected':''}>${d.name} (${d.tag})</option>`).join('')}
           </select>
         </div>
@@ -626,17 +729,17 @@ function renderResults(main){
           <div class="panel" style="border:1px dashed #e4e9f2">
             <div class="panel-hd"><div class="panel-title">${pl.type} <span class="badge">(${pl.tag})</span></div></div>
             <div class="panel-bd">
-              <div class="kv"><label>Type</label><input value="${pl.type}" oninput="model.results.plotGroups[${idx}].plots[${pi}].type=this.value" placeholder="Surface/Line/Arrow等"></div>
+              <div class="kv"><label>Type</label><input value="${pl.type}" oninput="model.results.plotGroups[${idx}].plots[${pi}].type=this.value;autoSave()" placeholder="Surface/Line/Arrow等"></div>
               <div class="kv"><label>Selection（ID）</label><div>${chipsHTML(pl.selection, v=>{pl.selection=v;})}</div></div>
-              <div class="kv"><label>Expression</label><input value="${pl.expr||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].expr=this.value"></div>
-              <div class="kv"><label>Unit</label><input value="${pl.unit||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].unit=this.value"></div>
-              <div class="kv"><label>Note</label><input value="${pl.note||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].note=this.value"></div>
-              <div class="small"><button class="row-del" onclick="model.results.plotGroups[${idx}].plots.splice(${pi},1);showContent('results')">🗑 Plot削除</button></div>
+              <div class="kv"><label>Expression</label><input value="${pl.expr||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].expr=this.value;autoSave()"></div>
+              <div class="kv"><label>Unit</label><input value="${pl.unit||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].unit=this.value;autoSave()"></div>
+              <div class="kv"><label>Note</label><input value="${pl.note||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].note=this.value;autoSave()"></div>
+              <div class="small"><button class="row-del" onclick="model.results.plotGroups[${idx}].plots.splice(${pi},1);showContent('results');autoSave()">🗑 Plot削除</button></div>
             </div>
           </div>
         `).join('')}
         <div class="hr"></div>
-        <div class="small"><button class="row-del" onclick="model.results.plotGroups.splice(${idx},1);showContent('results')">🗑 Plot Group削除</button></div>
+        <div class="small"><button class="row-del" onclick="model.results.plotGroups.splice(${idx},1);showContent('results');autoSave()">🗑 Plot Group削除</button></div>
       </div></div>`;
   });
 
@@ -646,18 +749,20 @@ function renderResults(main){
 function addDataset(){
   model.results.datasets.push({tag:newTag('dset'),name:`Solution ${nextId.dset-1}`,fromStudy:model.study.tag,note:''});
   showContent('results');
+  autoSave();
 }
 function addPlotGroup(){
   const d = model.results.datasets[0]?.tag;
   model.results.plotGroups.push({tag:newTag('pg'),name:`3D Plot Group ${nextId.pg-1}`,datasetTag:d,plots:[]});
   showContent('results');
+  autoSave();
 }
 function addPlot(pgIndex){
   model.results.plotGroups[pgIndex].plots.push({tag:newTag('plt'),type:'Surface',selection:[],expr:'',unit:'',note:''});
   showContent('results');
+  autoSave();
 }
 
-/* ====== Derived Values ====== */
 function renderDerived(main){
   let html = panel('Derived Values');
   html += `<div class="table-actions" style="margin-bottom:8px">${addBtn('＋Derived追加',"addDerived()")}</div>`;
@@ -665,12 +770,12 @@ function renderDerived(main){
     html += `<div class="panel">
       <div class="panel-hd"><div class="panel-title">${d.name} <span class="badge">(${d.tag})</span></div></div>
       <div class="panel-bd">
-        <div class="kv"><label>Name</label><input value="${d.name}" oninput="model.results.derived[${idx}].name=this.value"></div>
-        <div class="kv"><label>Type</label><input value="${d.type}" oninput="model.results.derived[${idx}].type=this.value" placeholder="Point/Line/Surface Average 等"></div>
+        <div class="kv"><label>Name</label><input value="${d.name}" oninput="model.results.derived[${idx}].name=this.value;autoSave()"></div>
+        <div class="kv"><label>Type</label><input value="${d.type}" oninput="model.results.derived[${idx}].type=this.value;autoSave()" placeholder="Point/Line/Surface Average 等"></div>
         <div class="kv"><label>Selection（ID）</label><div>${chipsHTML(d.selection, v=>{d.selection=v;})}</div></div>
-        <div class="kv"><label>Expression</label><input value="${d.expr||''}" oninput="model.results.derived[${idx}].expr=this.value"></div>
-        <div class="kv"><label>Note</label><input value="${d.note||''}" oninput="model.results.derived[${idx}].note=this.value"></div>
-        <div class="small"><button class="row-del" onclick="model.results.derived.splice(${idx},1);showContent('derived')">🗑 Derived削除</button></div>
+        <div class="kv"><label>Expression</label><input value="${d.expr||''}" oninput="model.results.derived[${idx}].expr=this.value;autoSave()"></div>
+        <div class="kv"><label>Note</label><input value="${d.note||''}" oninput="model.results.derived[${idx}].note=this.value;autoSave()"></div>
+        <div class="small"><button class="row-del" onclick="model.results.derived.splice(${idx},1);showContent('derived');autoSave()">🗑 Derived削除</button></div>
       </div></div>`;
   });
   html += panelEnd();
@@ -679,9 +784,9 @@ function renderDerived(main){
 function addDerived(){
   model.results.derived.push({tag:newTag('plt'),name:`Derived ${nextId.plt-1}`,type:'Line Average',selection:[],expr:'',note:''});
   showContent('derived');
+  autoSave();
 }
 
-/* ====== 汎用テーブル（行追加/削除） ====== */
 function tableGeneric(id, headers, rows, onCell, onAdd, onDel){
   const head = headers.map(h=>`<th>${h}</th>`).join('') + '<th></th>';
   const body = rows.length? rows.map((r,ri)=>`
@@ -695,7 +800,6 @@ function tableGeneric(id, headers, rows, onCell, onAdd, onDel){
     <table class="table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
-/* init */
 updateStats();
 </script>
 </body>
