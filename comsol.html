@@ -1,628 +1,702 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COMSOL設定管理チェックリスト</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>COMSOL設定管理（COMSOL風フル版）</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;background:#f3f6fb;color:#333}
+.container{display:flex;height:100vh}
+.sidebar{width:340px;background:#fff;border-right:1px solid #dfe3ea;overflow-y:auto;box-shadow:2px 0 5px rgba(0,0,0,.05)}
+.header{background:#1f4e79;color:#fff;padding:16px 18px;font-size:16px;font-weight:700}
+.modelroot{padding:10px 18px;color:#1f4e79;font-weight:700;border-bottom:1px solid #eef2f7}
+.category{border-bottom:1px solid #eef2f7}
+.category-header{padding:12px 18px;background:#f7f9fc;cursor:pointer;display:flex;align-items:center;transition:background .15s}
+.category-header:hover{background:#eef4ff}
+.category-header.active{background:#e8f1ff;color:#2c5aa0}
+.category-icon{width:24px;height:24px;margin-right:10px;display:flex;align-items:center;justify-content:center}
+.toggle-icon{margin-left:auto;transition:transform .25s;font-size:13px}
+.toggle-icon.expanded{transform:rotate(90deg)}
+.subcategories{display:none;background:#fff}
+.subcategories.show{display:block}
+.subcategory{padding:10px 18px 10px 52px;cursor:pointer;border-left:3px solid transparent;font-size:13px}
+.subcategory:hover{background:#f6f9ff}
+.subcategory.active{background:#e8f1ff;border-left-color:#2c5aa0;color:#2c5aa0;font-weight:600}
+.main-content{flex:1;display:flex;gap:16px;padding:16px;overflow:hidden}
+.view-placeholder{flex:1;background:linear-gradient(180deg,#f8fbff,#fff);border:1px dashed #d5ddeb;border-radius:8px;min-height:200px;display:flex;align-items:center;justify-content:center;color:#8aa1c1}
+.details{flex:1.4;min-width:520px;max-width:920px;overflow:auto}
+.panel{background:#fff;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.06);border:1px solid #e7ecf5;margin-bottom:14px}
+.panel-hd{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#f7f9fc;border-bottom:1px solid #e7ecf5}
+.panel-title{font-weight:800;color:#2c5aa0}
+.panel-bd{padding:14px 16px}
+.badge{display:inline-block;padding:2px 7px;border-radius:12px;background:#eef5ff;color:#2c5aa0;font-size:11px;margin-left:6px}
+.kv{display:grid;grid-template-columns:180px 1fr;gap:10px;margin:6px 0}
+.kv label{font-size:12px;color:#667}
+.kv input,.kv select{border:1px solid #d9e0ea;border-radius:6px;padding:8px;font-size:13px}
+.section{margin:8px 0 12px}
+.section-title{font-weight:800;color:#1f4e79;margin:10px 0 6px}
+.small{font-size:12px;color:#8795a8}
+.hr{height:1px;background:#eef2f7;margin:10px 0}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-            color: #333;
-        }
+/* Table editor */
+.table-wrap{border:1px solid #e4e9f2;border-radius:8px;overflow:hidden;margin:8px 0;background:#fff}
+.table-head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f7f9fc;border-bottom:1px solid #e4e9f2}
+.table-title{font-weight:700;color:#2c5aa0}
+.table-actions button{border:1px solid #2c5aa0;background:#2c5aa0;color:#fff;font-size:12px;padding:6px 10px;border-radius:6px;cursor:pointer}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px solid #eef2f7;padding:8px 10px;font-size:13px;vertical-align:top}
+.table th{background:#fafcff;text-align:left;color:#556}
+.table td input,.table td textarea,.table td select{width:100%;padding:6px;border:1px solid #d9e0ea;border-radius:6px;font-size:13px;font-family:Consolas,Monaco,monospace}
+.table td textarea{min-height:44px;resize:vertical}
+.row-del{cursor:pointer;border:none;background:transparent;font-size:18px;line-height:1;color:#b00020}
+.switch{position:relative;display:inline-block;width:38px;height:22px}
+.switch input{display:none}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#cdd7e6;transition:.2s;border-radius:22px}
+.slider:before{position:absolute;content:"";height:18px;width:18px;left:2px;bottom:2px;background:white;transition:.2s;border-radius:50%}
+input:checked + .slider{background:#2c5aa0}
+input:checked + .slider:before{transform:translateX(16px)}
 
-        .container {
-            display: flex;
-            height: 100vh;
-        }
+/* Selection chips */
+.chips{display:flex;gap:6px;flex-wrap:wrap;border:1px solid #d9e0ea;border-radius:6px;padding:6px}
+.chip{background:#eef5ff;color:#1f4e79;border-radius:12px;padding:3px 8px;font-size:12px}
+.chips input{border:none;outline:none;min-width:120px}
 
-        .sidebar {
-            width: 320px;
-            background: #ffffff;
-            border-right: 1px solid #ddd;
-            overflow-y: auto;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-        }
-
-        .header {
-            background: #2c5aa0;
-            color: white;
-            padding: 20px;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .category {
-            border-bottom: 1px solid #eee;
-        }
-
-        .category-header {
-            padding: 15px 20px;
-            background: #f8f9fa;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: background 0.2s;
-            user-select: none;
-        }
-
-        .category-header:hover {
-            background: #e9ecef;
-        }
-
-        .category-header.active {
-            background: #e3f2fd;
-            color: #1976d2;
-            font-weight: 600;
-        }
-
-        .category-icon {
-            width: 24px;
-            height: 24px;
-            margin-right: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .toggle-icon {
-            margin-left: auto;
-            transition: transform 0.3s;
-            font-size: 14px;
-        }
-
-        .toggle-icon.expanded {
-            transform: rotate(90deg);
-        }
-
-        .subcategories {
-            display: none;
-            background: #fafafa;
-        }
-
-        .subcategories.show {
-            display: block;
-        }
-
-        .subcategory {
-            padding: 12px 20px 12px 56px;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-size: 14px;
-            border-left: 3px solid transparent;
-        }
-
-        .subcategory:hover {
-            background: #f0f0f0;
-        }
-
-        .subcategory.active {
-            background: #e3f2fd;
-            border-left-color: #1976d2;
-            color: #1976d2;
-            font-weight: 500;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            background: #fafafa;
-        }
-
-        .content-header {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-        }
-
-        .content-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #2c5aa0;
-            margin-bottom: 8px;
-        }
-
-        .content-description {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .settings-panel {
-            background: white;
-            border-radius: 8px;
-            padding: 25px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-        }
-
-        .setting-group {
-            margin-bottom: 25px;
-            padding-bottom: 25px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .setting-group:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .setting-label {
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #333;
-            font-size: 15px;
-        }
-
-        .check-item {
-            display: flex;
-            align-items: flex-start;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            transition: background 0.2s;
-        }
-
-        .check-item:hover {
-            background: #f8f9fa;
-        }
-
-        .check-item input[type="checkbox"] {
-            margin-right: 12px;
-            margin-top: 3px;
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .check-item label {
-            cursor: pointer;
-            flex: 1;
-            line-height: 1.5;
-        }
-
-        .check-item.checked {
-            background: #e8f5e9;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            margin-top: 8px;
-            font-family: 'Consolas', 'Monaco', monospace;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: #2c5aa0;
-        }
-
-        textarea.input-field {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-        .progress-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: #e0e0e0;
-            z-index: 1000;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #2c5aa0, #4caf50);
-            transition: width 0.3s;
-            width: 0%;
-        }
-
-        .stats {
-            background: white;
-            padding: 15px 20px;
-            border-top: 1px solid #ddd;
-            position: sticky;
-            bottom: 0;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 13px;
-        }
-
-        .stat-label {
-            color: #666;
-        }
-
-        .stat-value {
-            font-weight: 600;
-            color: #2c5aa0;
-        }
-
-        .note-area {
-            margin-top: 10px;
-        }
-
-        .note-label {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-    </style>
+/* Footer stats */
+.stats{background:#fff;padding:12px 16px;border-top:1px solid #dfe3ea;position:sticky;bottom:0}
+.stat-row{display:flex;justify-content:space-between;font-size:12px}
+.progress-bar{position:fixed;bottom:0;left:0;right:0;height:4px;background:#e0e6ef;z-index:1000}
+.progress-fill{height:100%;background:linear-gradient(90deg,#1f4e79,#4caf50);transition:width .25s;width:0%}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <div class="header">COMSOL設定管理</div>
-            
-            <div class="category">
-                <div class="category-header" onclick="toggleCategory(this)">
-                    <div class="category-icon">📊</div>
-                    <span>グローバル定義</span>
-                    <span class="toggle-icon">▶</span>
-                </div>
-                <div class="subcategories">
-                    <div class="subcategory" onclick="showContent('parameters')">Parameters</div>
-                    <div class="subcategory" onclick="showContent('variables')">Variables</div>
-                    <div class="subcategory" onclick="showContent('functions')">Functions</div>
-                </div>
-            </div>
+<div class="container">
 
-            <div class="category">
-                <div class="category-header" onclick="toggleCategory(this)">
-                    <div class="category-icon">🔷</div>
-                    <span>ジオメトリ</span>
-                    <span class="toggle-icon">▶</span>
-                </div>
-                <div class="subcategories">
-                    <div class="subcategory" onclick="showContent('geometry-basic')">基本形状</div>
-                    <div class="subcategory" onclick="showContent('geometry-boolean')">ブール演算</div>
-                    <div class="subcategory" onclick="showContent('geometry-dims')">寸法・配置</div>
-                </div>
-            </div>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="header">Model Builder</div>
+    <div class="modelroot">モデル（Model 1）</div>
 
-            <div class="category">
-                <div class="category-header" onclick="toggleCategory(this)">
-                    <div class="category-icon">🎨</div>
-                    <span>材料</span>
-                    <span class="toggle-icon">▶</span>
-                </div>
-                <div class="subcategories">
-                    <div class="subcategory" onclick="showContent('materials')">材料設定</div>
-                    <div class="subcategory" onclick="showContent('material-props')">材料物性</div>
-                </div>
-            </div>
-
-            <div class="category">
-                <div class="category-header" onclick="toggleCategory(this)">
-                    <div class="category-icon">⚡</div>
-                    <span>物理</span>
-                    <span class="toggle-icon">▶</span>
-                </div>
-                <div class="subcategories">
-                    <div class="subcategory" onclick="showContent('physics-type')">物理タイプ</div>
-                    <div class="subcategory" onclick="showContent('boundary-conditions')">境界条件</div>
-                    <div class="subcategory" onclick="showContent('initial-values')">初期値</div>
-                </div>
-            </div>
-
-            <div class="category">
-                <div class="category-header" onclick="toggleCategory(this)">
-                    <div class="category-icon">🔬</div>
-                    <span>メッシュ</span>
-                    <span class="toggle-icon">▶</span>
-                </div>
-                <div class="subcategories">
-                    <div class="subcategory" onclick="showContent('mesh-size')">メッシュサイズ</div>
-                    <div class="subcategory" onclick="showContent('mesh-refinement')">メッシュ調整</div>
-                </div>
-            </div>
-
-            <div class="category">
-                <div class="category-header" onclick="toggleCategory(this)">
-                    <div class="category-icon">📈</div>
-                    <span>スタディ</span>
-                    <span class="toggle-icon">▶</span>
-                </div>
-                <div class="subcategories">
-                    <div class="subcategory" onclick="showContent('study-type')">スタディタイプ</div>
-                    <div class="subcategory" onclick="showContent('solver-settings')">ソルバー設定</div>
-                    <div class="subcategory" onclick="showContent('convergence')">収束条件</div>
-                </div>
-            </div>
-
-            <div class="stats">
-                <div class="stat-row">
-                    <span class="stat-label">チェック済み</span>
-                    <span class="stat-value"><span id="checked-count">0</span> / <span id="total-count">0</span></span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">進捗率</span>
-                    <span class="stat-value"><span id="progress-percent">0</span>%</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="main-content" id="main-content">
-            <div class="content-header">
-                <div class="content-title">COMSOL設定管理チェックリスト</div>
-                <div class="content-description">左側のメニューから項目を選択して、各設定を確認・記録してください</div>
-            </div>
-        </div>
+    <!-- Global Definitions -->
+    <div class="category">
+      <div class="category-header" onclick="toggleCategory(this)">
+        <div class="category-icon">📊</div><span>グローバル定義（Global Definitions）</span><span class="toggle-icon">▶</span>
+      </div>
+      <div class="subcategories">
+        <div class="subcategory" onclick="showContent('parameters')">Parameters</div>
+        <div class="subcategory" onclick="showContent('variables')">Variables</div>
+        <div class="subcategory" onclick="showContent('functions')">Functions</div>
+      </div>
     </div>
 
-    <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill"></div>
+    <!-- Component -->
+    <div class="category">
+      <div class="category-header" onclick="toggleCategory(this)">
+        <div class="category-icon">🧩</div><span>コンポーネント 1（comp1）</span><span class="toggle-icon">▶</span>
+      </div>
+      <div class="subcategories">
+        <div class="subcategory" onclick="showContent('geometry')">Geometry</div>
+        <div class="subcategory" onclick="showContent('materials')">Materials</div>
+        <div class="subcategory" onclick="showContent('physics')">Physics</div>
+        <div class="subcategory" onclick="showContent('mesh')">Mesh</div>
+      </div>
     </div>
 
-    <script>
-        const contentData = {
-            'parameters': {
-                title: 'Parameters（パラメータ）',
-                description: 'グローバルパラメータの設定を確認',
-                items: [
-                    { label: 'すべてのパラメータ名が統一されている', input: 'text', placeholder: 'パラメータリスト（例：L=10[mm], R=5[mm]）' },
-                    { label: 'パラメータの単位が正しく設定されている', input: 'text', placeholder: '単位の確認内容' },
-                    { label: 'パラメータの値が意図した範囲内である', input: 'text', placeholder: '値の範囲（例：0<R<100）' },
-                    { label: 'パラメータの命名規則が統一されている', input: 'textarea', placeholder: '命名規則の説明' }
-                ]
-            },
-            'variables': {
-                title: 'Variables（変数）',
-                description: 'グローバル変数の定義を確認',
-                items: [
-                    { label: '変数の定義式が全ファイルで一致している', input: 'textarea', placeholder: '変数定義リスト' },
-                    { label: '変数の評価順序が適切である', input: 'text', placeholder: '評価順序の確認' },
-                    { label: '循環参照がない', input: 'text', placeholder: '依存関係チェック' }
-                ]
-            },
-            'functions': {
-                title: 'Functions（関数）',
-                description: 'ユーザー定義関数の確認',
-                items: [
-                    { label: '関数の定義が全ファイルで一致している', input: 'textarea', placeholder: '関数リスト' },
-                    { label: '補間関数のデータソースが正しい', input: 'text', placeholder: 'データソースのパス' },
-                    { label: '解析関数の数式が正しい', input: 'textarea', placeholder: '数式の確認' }
-                ]
-            },
-            'geometry-basic': {
-                title: 'ジオメトリ - 基本形状',
-                description: '基本的なジオメトリ形状の確認',
-                items: [
-                    { label: '形状の寸法がパラメータで定義されている', input: 'text', placeholder: '使用パラメータ' },
-                    { label: '座標系が統一されている', input: 'text', placeholder: '座標系（例：Cartesian, Cylindrical）' },
-                    { label: '作業平面の設定が一致している', input: 'text', placeholder: '作業平面の確認' },
-                    { label: 'スケッチの拘束条件が適切である', input: 'textarea', placeholder: '拘束条件リスト' }
-                ]
-            },
-            'geometry-boolean': {
-                title: 'ジオメトリ - ブール演算',
-                description: 'ブール演算の設定確認',
-                items: [
-                    { label: 'Union/Intersection/Differenceの順序が正しい', input: 'textarea', placeholder: '演算順序' },
-                    { label: '形状のラベリングが統一されている', input: 'text', placeholder: 'ラベル命名規則' },
-                    { label: 'Form Union/Assembly の設定が一致している', input: 'text', placeholder: '設定内容' }
-                ]
-            },
-            'geometry-dims': {
-                title: 'ジオメトリ - 寸法・配置',
-                description: '寸法と配置の確認',
-                items: [
-                    { label: 'すべての寸法がパラメトリックである', input: 'text', placeholder: '固定値の有無' },
-                    { label: '配列パターンの設定が一致している', input: 'text', placeholder: '配列設定' },
-                    { label: '対称条件が適切に設定されている', input: 'text', placeholder: '対称条件' }
-                ]
-            },
-            'materials': {
-                title: '材料設定',
-                description: '材料の割り当て確認',
-                items: [
-                    { label: 'すべてのドメインに材料が割り当てられている', input: 'textarea', placeholder: 'ドメインと材料の対応' },
-                    { label: '材料名が統一されている', input: 'text', placeholder: '材料名リスト' },
-                    { label: '材料ライブラリのバージョンが一致している', input: 'text', placeholder: 'バージョン情報' }
-                ]
-            },
-            'material-props': {
-                title: '材料物性',
-                description: '材料物性値の確認',
-                items: [
-                    { label: '密度が正しく設定されている', input: 'text', placeholder: '密度の値' },
-                    { label: '熱伝導率が正しく設定されている', input: 'text', placeholder: '熱伝導率の値' },
-                    { label: '電気伝導率が正しく設定されている', input: 'text', placeholder: '電気伝導率の値' },
-                    { label: '温度依存性が適切に設定されている', input: 'textarea', placeholder: '温度依存式' },
-                    { label: 'カスタム物性値が全ファイルで一致している', input: 'textarea', placeholder: 'カスタム物性リスト' }
-                ]
-            },
-            'physics-type': {
-                title: '物理タイプ',
-                description: '物理インターフェースの確認',
-                items: [
-                    { label: '物理インターフェースの種類が一致している', input: 'text', placeholder: '物理タイプ（例：mf, ec）' },
-                    { label: '多物理連成の設定が正しい', input: 'textarea', placeholder: '連成設定' },
-                    { label: '物理フィールド変数名が統一されている', input: 'text', placeholder: '変数名リスト' }
-                ]
-            },
-            'boundary-conditions': {
-                title: '境界条件',
-                description: '境界条件の設定確認',
-                items: [
-                    { label: 'すべての境界に条件が設定されている', input: 'textarea', placeholder: '境界リスト' },
-                    { label: '境界条件の値が正しい', input: 'textarea', placeholder: '境界条件の詳細' },
-                    { label: '境界選択が正しい（境界番号の確認）', input: 'text', placeholder: '境界番号リスト' },
-                    { label: '周期境界条件が適切に設定されている', input: 'text', placeholder: '周期境界の設定' },
-                    { label: '対称境界条件が適切に設定されている', input: 'text', placeholder: '対称境界の設定' }
-                ]
-            },
-            'initial-values': {
-                title: '初期値',
-                description: '初期値の設定確認',
-                items: [
-                    { label: '初期値が物理的に妥当である', input: 'textarea', placeholder: '初期値の詳細' },
-                    { label: '過渡解析の初期時刻が正しい', input: 'text', placeholder: '初期時刻' },
-                    { label: '初期値の与え方が統一されている', input: 'text', placeholder: '設定方法' }
-                ]
-            },
-            'mesh-size': {
-                title: 'メッシュサイズ',
-                description: 'メッシュサイズの設定確認',
-                items: [
-                    { label: 'グローバルメッシュサイズが統一されている', input: 'text', placeholder: 'メッシュサイズ（例：Fine, Normal）' },
-                    { label: '最大要素サイズが適切である', input: 'text', placeholder: '最大サイズ' },
-                    { label: '最小要素サイズが適切である', input: 'text', placeholder: '最小サイズ' },
-                    { label: '要素成長率が適切である', input: 'text', placeholder: '成長率' }
-                ]
-            },
-            'mesh-refinement': {
-                title: 'メッシュ調整',
-                description: 'メッシュの詳細設定確認',
-                items: [
-                    { label: '境界層メッシュの設定が一致している', input: 'textarea', placeholder: '境界層メッシュ設定' },
-                    { label: '局所的なメッシュ細分化が統一されている', input: 'textarea', placeholder: '細分化領域' },
-                    { label: 'メッシュ品質が十分である（歪み度）', input: 'text', placeholder: '品質指標' }
-                ]
-            },
-            'study-type': {
-                title: 'スタディタイプ',
-                description: 'スタディの種類と設定',
-                items: [
-                    { label: 'スタディタイプが統一されている', input: 'text', placeholder: 'スタディタイプ（例：Stationary, Time Dependent）' },
-                    { label: 'パラメトリックスイープの範囲が正しい', input: 'textarea', placeholder: 'パラメータ範囲' },
-                    { label: '時間ステップ設定が適切である', input: 'text', placeholder: '時間ステップ' },
-                    { label: '周波数範囲が正しい（周波数応答解析）', input: 'text', placeholder: '周波数範囲' }
-                ]
-            },
-            'solver-settings': {
-                title: 'ソルバー設定',
-                description: 'ソルバーの詳細設定',
-                items: [
-                    { label: 'ソルバータイプが統一されている', input: 'text', placeholder: 'ソルバータイプ' },
-                    { label: '線形ソルバーの設定が一致している', input: 'text', placeholder: '線形ソルバー設定' },
-                    { label: '非線形ソルバーの設定が一致している', input: 'text', placeholder: '非線形ソルバー設定' },
-                    { label: 'ダンピング係数が適切である', input: 'text', placeholder: 'ダンピング係数' }
-                ]
-            },
-            'convergence': {
-                title: '収束条件',
-                description: '収束判定の設定確認',
-                items: [
-                    { label: '相対許容誤差が統一されている', input: 'text', placeholder: '相対許容誤差' },
-                    { label: '絶対許容誤差が統一されている', input: 'text', placeholder: '絶対許容誤差' },
-                    { label: '最大反復回数が適切である', input: 'text', placeholder: '最大反復回数' },
-                    { label: '収束判定基準が統一されている', input: 'textarea', placeholder: '収束判定基準の詳細' }
-                ]
-            }
-        };
+    <!-- Study -->
+    <div class="category">
+      <div class="category-header" onclick="toggleCategory(this)">
+        <div class="category-icon">📈</div><span>スタディ（Study）</span><span class="toggle-icon">▶</span>
+      </div>
+      <div class="subcategories">
+        <div class="subcategory" onclick="showContent('study')">Study 1</div>
+        <div class="subcategory" onclick="showContent('solver')">Solver / Convergence</div>
+      </div>
+    </div>
 
-        let checkStates = {};
-        let inputValues = {};
+    <!-- Results -->
+    <div class="category">
+      <div class="category-header" onclick="toggleCategory(this)">
+        <div class="category-icon">🧪</div><span>結果（Results）</span><span class="toggle-icon">▶</span>
+      </div>
+      <div class="subcategories">
+        <div class="subcategory" onclick="showContent('results')">Datasets / Plot Groups</div>
+        <div class="subcategory" onclick="showContent('derived')">Derived Values</div>
+      </div>
+    </div>
 
-        function initializeData() {
-            for (let key in contentData) {
-                checkStates[key] = contentData[key].items.map(() => false);
-                inputValues[key] = contentData[key].items.map(() => '');
-            }
-        }
+    <div class="stats">
+      <div class="stat-row"><span>チェック済み</span><span><span id="checked-count">0</span>/<span id="total-count">0</span></span></div>
+      <div class="stat-row"><span>進捗率</span><span><span id="progress-percent">0</span>%</span></div>
+    </div>
+  </div>
 
-        function toggleCategory(element) {
-            const subcategories = element.nextElementSibling;
-            const icon = element.querySelector('.toggle-icon');
-            
-            subcategories.classList.toggle('show');
-            icon.classList.toggle('expanded');
-        }
+  <!-- Main -->
+  <div class="main-content">
+    <div class="view-placeholder">（ビュー領域 / 参考：COMSOLのグラフィックス）</div>
+    <div class="details" id="main">
+      <div class="panel">
+        <div class="panel-hd"><div class="panel-title">COMSOL設定管理（COMSOL風）</div></div>
+        <div class="panel-bd small">左のツリーからノードを選択すると、右側に「Settings」風の編集UIが表示されます。ブロックの <b>Active</b> トグル、(tag) 自動採番、Selectionチップ、Unit列、Studyのステップ、ResultsのPlot Group/Dataset などを実装しています。</div>
+      </div>
+    </div>
+  </div>
+</div>
 
-        function showContent(contentId) {
-            document.querySelectorAll('.subcategory').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
+<div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
 
-            const data = contentData[contentId];
-            const mainContent = document.getElementById('main-content');
-            
-            let html = `
-                <div class="content-header">
-                    <div class="content-title">${data.title}</div>
-                    <div class="content-description">${data.description}</div>
-                </div>
-                <div class="settings-panel">
-            `;
+<script>
+/* ================================
+   タグ自動採番
+================================ */
+const nextId = {
+  param:1, var:1, fn:1,
+  blk:1, cyl:1, dif:1, arr:1, // geometry features（例）
+  mat:1, bc:1, mesh:1,
+  stp:1, dset:1, pg:1, plt:1,
+  mfh:1, ec:1, ht:1
+};
+function newTag(prefix){ return prefix + (nextId[prefix]++); }
 
-            data.items.forEach((item, index) => {
-                const isChecked = checkStates[contentId][index];
-                const value = inputValues[contentId][index];
-                
-                html += `
-                    <div class="setting-group">
-                        <div class="check-item ${isChecked ? 'checked' : ''}" id="check-${contentId}-${index}">
-                            <input type="checkbox" id="checkbox-${contentId}-${index}" 
-                                   ${isChecked ? 'checked' : ''}
-                                   onchange="toggleCheck('${contentId}', ${index})">
-                            <label for="checkbox-${contentId}-${index}">${item.label}</label>
-                        </div>
-                        ${item.input === 'textarea' ? 
-                            `<textarea class="input-field" placeholder="${item.placeholder}" 
-                                       oninput="saveInput('${contentId}', ${index}, this.value)">${value}</textarea>` :
-                            `<input type="text" class="input-field" placeholder="${item.placeholder}" 
-                                    value="${value}" oninput="saveInput('${contentId}', ${index}, this.value)">`
-                        }
-                    </div>
-                `;
-            });
+/* ================================
+   進捗（チェック項目）
+================================ */
+let checkStates = {}, inputValues = {};
+function initChecks(id, items=[]){
+  checkStates[id] = items.map(()=>false);
+  inputValues[id] = items.map(()=> '');
+}
+function toggleCheck(id,i){
+  checkStates[id][i]=!checkStates[id][i];
+  updateStats();
+}
+function saveInput(id,i,v){ inputValues[id][i]=v; }
+function updateStats(){
+  let t=0,d=0;
+  for(const k in checkStates){ t+=checkStates[k].length; d+=checkStates[k].filter(Boolean).length; }
+  const p=t?Math.round(100*d/t):0;
+  document.getElementById('checked-count').textContent=d;
+  document.getElementById('total-count').textContent=t;
+  document.getElementById('progress-percent').textContent=p;
+  document.getElementById('progress-fill').style.width=p+'%';
+}
 
-            html += '</div>';
-            mainContent.innerHTML = html;
-        }
+/* ================================
+   Selection chips
+================================ */
+function parseRanges(str){
+  const out=[];
+  (str||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(tok=>{
+    if(/^\d+\s*-\s*\d+$/.test(tok)){
+      let [a,b]=tok.split('-').map(n=>+n.trim());
+      for(let k=Math.min(a,b); k<=Math.max(a,b); k++) out.push(k);
+    }else if(/^\d+$/.test(tok)){ out.push(+tok); }
+  });
+  return Array.from(new Set(out));
+}
+function chipsHTML(values, onChange){
+  const nodes = (values||[]).map(v=>`<span class="chip">${v}</span>`).join('');
+  const id = 'chips-'+Math.random().toString(36).slice(2);
+  setTimeout(()=>{
+    const input = document.querySelector(`#${id}`);
+    input.addEventListener('change', e=>{
+      onChange(parseRanges(e.target.value));
+      showContent(currentId); // 再描画
+    });
+  },0);
+  return `<div class="chips">${nodes}<input id="${id}" placeholder="例：1,2,5-8"/></div>`;
+}
 
-        function toggleCheck(contentId, index) {
-            checkStates[contentId][index] = !checkStates[contentId][index];
-            const checkItem = document.getElementById(`check-${contentId}-${index}`);
-            
-            if (checkStates[contentId][index]) {
-                checkItem.classList.add('checked');
-            } else {
-                checkItem.classList.remove('checked');
-            }
-            
-            updateStats();
-        }
+/* ================================
+   データモデル
+================================ */
+const model = {
+  global:{
+    parameters:[], // {tag,name,expr,unit,desc}
+    variables:[],
+    functions:[]   // {tag,fname,args,expr,unit,type}
+  },
+  comp1:{
+    geometry:{ features:[] }, // {tag,type,name,params:[]}
+    materials:[], // {tag,name,active:true, selection:[], props:[]}
+    physics:[],   // {tag,name,active:true,type, selection:[], params:[]}
+    mesh:{ features:[] } // {tag,name,type,active,selection:[], params:[]}
+  },
+  study:{
+    tag:'std1', name:'Study 1',
+    steps:[], // {tag,type,active,params:[], notes:''}
+    solver:[ // simple sheet
+      {type:'Linear/Nonlinear', lin:'', nonlin:'', precond:'', rel:'', abs:'', maxit:''}
+    ]
+  },
+  results:{
+    datasets:[],    // {tag,name,fromStudy:'std1',note:''}
+    plotGroups:[],  // {tag,name,datasetTag,plots:[{tag,type,selection:[],expr,unit,note}]}
+    derived:[]      // {tag,name,type,selection:[],expr,note}
+  }
+};
 
-        function saveInput(contentId, index, value) {
-            inputValues[contentId][index] = value;
-        }
+/* ====== 初期ノード（サンプル） ====== */
+function seed(){
+  // Parameters sample
+  model.global.parameters.push({tag:newTag('param'),name:'L',expr:'10',unit:'mm',desc:'長さ'});
+  model.global.variables.push({tag:newTag('var'),name:'area',expr:'L^2',unit:'mm^2',note:''});
+  model.global.functions.push({tag:newTag('fn'),fname:'f1',args:'x',expr:'sin(x)',unit:'',type:'Analytic'});
 
-        function updateStats() {
-            let totalChecks = 0;
-            let completedChecks = 0;
-            
-            for (let key in checkStates) {
-                totalChecks += checkStates[key].length;
-                completedChecks += checkStates[key].filter(state => state).length;
-            }
-            
-            const percentage = totalChecks > 0 ? Math.round((completedChecks / totalChecks) * 100) : 0;
-            
-            document.getElementById('checked-count').textContent = completedChecks;
-            document.getElementById('total-count').textContent = totalChecks;
-            document.getElementById('progress-percent').textContent = percentage;
-            document.getElementById('progress-fill').style.width = percentage + '%';
-        }
+  // Geometry
+  model.comp1.geometry.features.push({tag:newTag('blk'),type:'Block',name:'Block 1',params:[
+    {k:'Lx',v:'L',u:'mm'}, {k:'Ly',v:'L',u:'mm'}, {k:'H',v:'L',u:'mm'}
+  ]});
 
-        initializeData();
-        updateStats();
-    </script>
+  // Materials
+  model.comp1.materials.push({tag:newTag('mat'),name:'Material 1 – AIR',active:true,selection:[1],props:[
+    {prop:'rho',val:'1.2',unit:'kg/m^3'}
+  ]});
+
+  // Physics
+  model.comp1.physics.push({tag:'mfh'+(nextId.mfh++),name:'Magnetic Fields',type:'mfh',active:true,selection:[11,12],params:[]});
+
+  // Mesh
+  model.comp1.mesh.features.push({tag:newTag('mesh'),name:'Size',type:'Size',active:true,selection:[],params:[
+    {k:'最大要素',v:'L/5'},{k:'最小要素',v:'L/50'}
+  ]});
+
+  // Study steps
+  model.study.steps.push({tag:newTag('stp'),type:'Stationary',active:true,params:[],notes:''});
+  model.study.steps.push({tag:newTag('stp'),type:'Parametric Sweep',active:true,params:[
+    {k:'Parameter',v:'L'}, {k:'Range',v:'range(5[mm],1[mm],15[mm])'}
+  ],notes:''});
+
+  // Results
+  const d1 = {tag:newTag('dset'),name:'Solution 1',fromStudy:model.study.tag,note:''};
+  model.results.datasets.push(d1);
+  const pg1 = {tag:newTag('pg'),name:'3D Plot Group 1',datasetTag:d1.tag,plots:[
+    {tag:newTag('plt'),type:'Surface',selection:[],expr:'mf.normB',unit:'T',note:''}
+  ]};
+  model.results.plotGroups.push(pg1);
+  model.results.derived.push({tag:newTag('plt'),name:'Line Average 1',type:'Line Average',selection:[21,22],expr:'mf.Bz',note:''});
+}
+seed();
+
+/* ================================
+   レンダリング
+================================ */
+let currentId = null;
+function toggleCategory(el){
+  const subs = el.nextElementSibling;
+  const icon = el.querySelector('.toggle-icon');
+  subs.classList.toggle('show'); icon.classList.toggle('expanded');
+}
+function showContent(id){
+  currentId=id;
+  document.querySelectorAll('.subcategory').forEach(e=>e.classList.remove('active'));
+  event?.target?.classList?.add('active');
+  const main = document.getElementById('main');
+  if(id==='parameters') return renderParameters(main);
+  if(id==='variables')  return renderVariables(main);
+  if(id==='functions')  return renderFunctions(main);
+  if(id==='geometry')   return renderGeometry(main);
+  if(id==='materials')  return renderMaterials(main);
+  if(id==='physics')    return renderPhysics(main);
+  if(id==='mesh')       return renderMesh(main);
+  if(id==='study')      return renderStudy(main);
+  if(id==='solver')     return renderSolver(main);
+  if(id==='results')    return renderResults(main);
+  if(id==='derived')    return renderDerived(main);
+}
+
+/* ====== 共通UI小物 ====== */
+function panel(title,tag){ return `
+  <div class="panel"><div class="panel-hd">
+    <div class="panel-title">${title}${tag?` <span class="badge">(${tag})</span>`:''}</div>
+  </div><div class="panel-bd">`; }
+function panelEnd(){ return `</div></div>`; }
+function addBtn(label,onclick){ return `<button onclick="${onclick}">${label}</button>`; }
+function activeToggleHTML(obj, path){
+  const id='sw-'+Math.random().toString(36).slice(2);
+  setTimeout(()=>{
+    const el=document.getElementById(id);
+    el.checked = !!obj.active;
+    el.onchange = ()=>{ obj.active = el.checked; };
+  },0);
+  return `<label class="small">Active</label> <label class="switch"><input id="${id}" type="checkbox"><span class="slider"></span></label>`;
+}
+function unitSplit(expr){
+  // "10[mm]" -> {v:"10",u:"mm"} / "L" -> {v:"L",u:""}
+  const m = String(expr||'').match(/^(.*)\[(.+)\]\s*$/);
+  return m? {v:m[1],u:m[2]} : {v:expr,u:''};
+}
+
+/* ====== Parameters / Variables / Functions ====== */
+function renderParameters(main){
+  initChecks('parameters',[{},{},{}]); // ダミー（進捗用）
+  let html = panel('Parameters（パラメータ）');
+  html += tableSimple('parameters','param',
+    [{key:'name',label:'Name'},{key:'expr',label:'Expression'},{key:'unit',label:'Unit'},{key:'desc',label:'Description'}],
+    model.global.parameters,
+    (row,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); row.expr=p.v; if(!row.unit) row.unit=p.u; } row[k]=v; },
+    ()=> model.global.parameters.push({tag:newTag('param'),name:'',expr:'',unit:'',desc:''})
+  );
+  html += panelEnd();
+  main.innerHTML = html;
+}
+function renderVariables(main){
+  initChecks('variables',[{}]);
+  let html = panel('Variables（変数）');
+  html += tableSimple('variables','var',
+    [{key:'name',label:'Name'},{key:'expr',label:'Expression'},{key:'unit',label:'Unit'},{key:'note',label:'Note'}],
+    model.global.variables,
+    (r,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); r.expr=p.v; if(!r.unit) r.unit=p.u; } r[k]=v; },
+    ()=> model.global.variables.push({tag:newTag('var'),name:'',expr:'',unit:'',note:''})
+  );
+  html += panelEnd();
+  main.innerHTML = html;
+}
+function renderFunctions(main){
+  initChecks('functions',[{}]);
+  let html = panel('Functions（関数）');
+  html += tableSimple('functions','fn',
+    [{key:'fname',label:'Name'},{key:'args',label:'Arguments'},{key:'expr',label:'Expression'},{key:'unit',label:'Unit'},{key:'type',label:'Type'}],
+    model.global.functions,
+    (r,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); r.expr=p.v; if(!r.unit) r.unit=p.u; } r[k]=v; },
+    ()=> model.global.functions.push({tag:newTag('fn'),fname:'',args:'',expr:'',unit:'',type:'Analytic'})
+  );
+  html += panelEnd();
+  main.innerHTML = html;
+}
+function tableSimple(contentId, prefix, columns, rows, onChange, onAdd){
+  const head = columns.map(c=>`<th>${c.label}</th>`).join('')+'<th>Tag</th><th></th>';
+  const body = rows.map((row,i)=>{
+    const tds = columns.map(c=>{
+      const val=row[c.key]??'';
+      return `<td><input type="text" value="${val}" oninput="(${onChange})(modelPath('${contentId}')[${i}],'${c.key}',this.value)"></td>`;
+    }).join('');
+    return `<tr>${tds}<td class="small">${row.tag||''}</td>
+      <td><button class="row-del" onclick="modelPath('${contentId}').splice(${i},1);showContent('${contentId}')">🗑</button></td></tr>`;
+  }).join('') || `<tr><td colspan="${columns.length+2}" class="small">行がありません。「＋行追加」で追加。</td></tr>`;
+  const addCall = `(${onAdd})();showContent('${contentId}')`;
+  // modelPath helper は eval避けのためswitchで実装
+  return `
+  <div class="table-wrap">
+    <div class="table-head"><div class="table-title">${prefix.toUpperCase()}</div>
+      <div class="table-actions"><button onclick="${addCall}">＋行追加</button></div></div>
+    <table class="table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>
+  </div>`;
+}
+function modelPath(id){
+  switch(id){
+    case 'parameters': return model.global.parameters;
+    case 'variables' : return model.global.variables;
+    case 'functions' : return model.global.functions;
+  }
+  return [];
+}
+
+/* ====== Geometry ====== */
+function renderGeometry(main){
+  let html = panel('Geometry（comp1/geom1）');
+  html += `<div class="section-title">Features</div>
+    <div class="small">COMSOLの「Block 1 (blk1)」「Difference 1 (dif1)」のように、タイプ＋番号のタグを自動付与します。</div>
+    <div class="hr"></div>
+    <div class="table-actions" style="margin-bottom:8px">
+      ${addBtn('＋Blockを追加', "addGeom('Block')")}
+      ${addBtn('＋Cylinderを追加', "addGeom('Cylinder')")}
+      ${addBtn('＋Differenceを追加', "addGeom('Difference')")}
+    </div>`;
+  model.comp1.geometry.features.forEach((f,idx)=>{
+    html += `<div class="panel" style="border:1px solid #eaeef6">
+      <div class="panel-hd"><div class="panel-title">${f.name} <span class="badge">(${f.tag})</span></div></div>
+      <div class="panel-bd">
+        <div class="section-title">Parameters</div>
+        ${tableKV(`geom-${idx}`, f.params, (k,v)=>{ f.params[k]=v; }, ( )=>{
+          f.params.push({k:'',v:'',u:''}); showContent('geometry');
+        })}
+        <div class="hr"></div>
+        <div class="small"><button class="row-del" onclick="model.comp1.geometry.features.splice(${idx},1);showContent('geometry')">🗑 削除</button></div>
+      </div></div>`;
+  });
+  html += panelEnd();
+  main.innerHTML = html;
+}
+function addGeom(type){
+  const mapTag = {Block:'blk',Cylinder:'cyl',Difference:'dif'};
+  const tag = newTag(mapTag[type]||'blk');
+  model.comp1.geometry.features.push({tag,type,name:`${type} ${nextId[mapTag[type]]-1}`,params:[]});
+  showContent('geometry');
+}
+function tableKV(id, rows, onChange, onAdd){
+  const body = (rows||[]).map((r,i)=>`
+    <tr>
+      <td><input type="text" value="${r.k||''}" oninput="${onChange.name}(${i}, {k:this.value,v:'${r.v||''}',u:'${r.u||''}'})"></td>
+      <td><input type="text" value="${r.v||''}" oninput="${onChange.name}(${i}, {k:'${r.k||''}',v:this.value,u:'${r.u||''}'})"></td>
+      <td><input type="text" value="${r.u||''}" oninput="${onChange.name}(${i}, {k:'${r.k||''}',v:'${r.v||''}',u:this.value})"></td>
+      <td><button class="row-del" onclick="${id.split('-')[0]==='geom'?'model.comp1.geometry.features['+id.split('-')[1]+'].params.splice('+i+',1)':''};showContent('geometry')">🗑</button></td>
+    </tr>
+  `).join('') || `<tr><td colspan="4" class="small">行がありません。「＋行追加」で追加。</td></tr>`;
+  return `
+  <div class="table-wrap">
+    <div class="table-head"><div class="table-title">Key / Value / Unit</div>
+      <div class="table-actions"><button onclick="${onAdd.name}()">＋行追加</button></div></div>
+    <table class="table"><thead><tr><th>Key</th><th>Value</th><th>Unit</th><th></th></tr></thead>
+      <tbody>${body}</tbody></table>
+  </div>`;
+}
+
+/* ====== Materials ====== */
+function renderMaterials(main){
+  let html = panel('Materials（comp1/materials）');
+  html += `<div class="table-actions" style="margin-bottom:8px">${addBtn('＋材料ブロック追加',"addMaterial()")}</div>`;
+  model.comp1.materials.forEach((m,idx)=>{
+    html += `<div class="panel">
+      <div class="panel-hd"><div class="panel-title">${m.name} <span class="badge">(${m.tag})</span></div>
+        <div style="margin-left:auto">${activeToggleHTML(m)}</div>
+      </div>
+      <div class="panel-bd">
+        <div class="kv"><label>表示名</label><input value="${m.name}" oninput="model.comp1.materials[${idx}].name=this.value"></div>
+        <div class="kv"><label>Selection（ドメインID）</label><div>${chipsHTML(m.selection, v=>{m.selection=v;})}</div></div>
+        <div class="section-title">カスタム物性</div>
+        ${tableGeneric(`mat-${idx}`, ['物性名','値/式','単位','備考'],
+          (m.props||[]).map(p=>[p.prop,p.val,p.unit,p.note||'']),
+          (r,c,val)=>{ const p=m.props[r]; if(!p) return; ['prop','val','unit','note'][c]=val; },
+          ()=>{ (m.props||=[]).push({prop:'',val:'',unit:'',note:''}); showContent('materials'); },
+          r=>{ m.props.splice(r,1); showContent('materials'); })}
+        <div class="small"><button class="row-del" onclick="model.comp1.materials.splice(${idx},1);showContent('materials')">🗑 ブロック削除</button></div>
+      </div></div>`;
+  });
+  html += panelEnd();
+  main.innerHTML=html;
+}
+function addMaterial(){
+  model.comp1.materials.push({tag:newTag('mat'),name:`Material ${nextId.mat-1}`,active:true,selection:[],props:[]});
+  showContent('materials');
+}
+
+/* ====== Physics ====== */
+function renderPhysics(main){
+  let html = panel('Physics（comp1）');
+  html += `<div class="table-actions" style="margin-bottom:8px">
+    ${addBtn('＋Magnetic Fields (mfh)',"addPhysics('mfh','Magnetic Fields')")}
+    ${addBtn('＋Electric Currents (ec)',"addPhysics('ec','Electric Currents')")}
+    ${addBtn('＋Heat Transfer (ht)',"addPhysics('ht','Heat Transfer')")}
+  </div>`;
+  model.comp1.physics.forEach((p,idx)=>{
+    html += `<div class="panel">
+      <div class="panel-hd"><div class="panel-title">${p.name} <span class="badge">(${p.tag})</span></div>
+        <div style="margin-left:auto">${activeToggleHTML(p)}</div>
+      </div>
+      <div class="panel-bd">
+        <div class="kv"><label>表示名</label><input value="${p.name}" oninput="model.comp1.physics[${idx}].name=this.value"></div>
+        <div class="kv"><label>Selection（領域/境界ID）</label><div>${chipsHTML(p.selection, v=>{p.selection=v;})}</div></div>
+        <div class="section-title">パラメータ</div>
+        ${tableGeneric(`phys-${idx}`, ['項目','値/式','単位','備考'],
+          (p.params||[]).map(q=>[q.k,q.v,q.u||'',q.note||'']),
+          (r,c,val)=>{ const q=p.params[r]; ['k','v','u','note'][c]=val; },
+          ()=>{ (p.params||[]).push({k:'',v:'',u:'',note:''}); showContent('physics'); },
+          r=>{ p.params.splice(r,1); showContent('physics'); })}
+        <div class="small"><button class="row-del" onclick="model.comp1.physics.splice(${idx},1);showContent('physics')">🗑 ブロック削除</button></div>
+      </div></div>`;
+  });
+  html += panelEnd();
+  main.innerHTML=html;
+}
+function addPhysics(type, name){
+  const tag = type + (nextId[type]++);
+  model.comp1.physics.push({tag,name,type,active:true,selection:[],params:[]});
+  showContent('physics');
+}
+
+/* ====== Mesh ====== */
+function renderMesh(main){
+  let html = panel('Mesh（comp1/mesh1）');
+  html += `<div class="table-actions" style="margin-bottom:8px">
+    ${addBtn('＋Size', "addMesh('Size')")}
+    ${addBtn('＋Free Tetrahedral', "addMesh('Free Tetrahedral')")}
+    ${addBtn('＋Swept', "addMesh('Swept')")}
+    ${addBtn('＋Mapped', "addMesh('Mapped')")}
+  </div>`;
+  model.comp1.mesh.features.forEach((f,idx)=>{
+    html += `<div class="panel">
+      <div class="panel-hd"><div class="panel-title">${f.name} <span class="badge">(${f.tag})</span></div>
+        <div style="margin-left:auto">${activeToggleHTML(f)}</div>
+      </div>
+      <div class="panel-bd">
+        <div class="kv"><label>Type</label><input value="${f.type}" oninput="model.comp1.mesh.features[${idx}].type=this.value"></div>
+        <div class="kv"><label>Selection（ID）</label><div>${chipsHTML(f.selection, v=>{f.selection=v;})}</div></div>
+        <div class="section-title">Parameters</div>
+        ${tableGeneric(`mesh-${idx}`, ['項目','値/式','備考'],
+          (f.params||[]).map(q=>[q.k,q.v,q.note||'']),
+          (r,c,val)=>{ const q=f.params[r]; ['k','v','note'][c]=val; },
+          ()=>{ (f.params||[]).push({k:'',v:'',note:''}); showContent('mesh'); },
+          r=>{ f.params.splice(r,1); showContent('mesh'); })}
+        <div class="small"><button class="row-del" onclick="model.comp1.mesh.features.splice(${idx},1);showContent('mesh')">🗑 ブロック削除</button></div>
+      </div></div>`;
+  });
+  html += panelEnd();
+  main.innerHTML=html;
+}
+function addMesh(type){
+  model.comp1.mesh.features.push({tag:newTag('mesh'),name:`${type} ${nextId.mesh-1}`,type,active:true,selection:[],params:[]});
+  showContent('mesh');
+}
+
+/* ====== Study / Solver ====== */
+function renderStudy(main){
+  let html = panel('Study 1（std1）', model.study.tag);
+  html += `<div class="section-title">Steps</div>
+    <div class="table-actions" style="margin-bottom:8px">
+      ${addBtn('＋Stationary',"addStep('Stationary')")}
+      ${addBtn('＋Time Dependent',"addStep('Time Dependent')")}
+      ${addBtn('＋Frequency Domain',"addStep('Frequency Domain')")}
+      ${addBtn('＋Parametric Sweep',"addStep('Parametric Sweep')")}
+    </div>`;
+  model.study.steps.forEach((s,idx)=>{
+    html += `<div class="panel">
+      <div class="panel-hd"><div class="panel-title">Step ${idx+1}: ${s.type} <span class="badge">(${s.tag})</span></div>
+        <div style="margin-left:auto">${activeToggleHTML(s)}</div>
+      </div>
+      <div class="panel-bd">
+        ${s.type==='Time Dependent'?`
+          <div class="kv"><label>時間設定（tlist）</label><input value="${(s.tlist||'')}" oninput="model.study.steps[${idx}].tlist=this.value" placeholder="t0:dt:t1 / range()"/></div>`:''}
+        ${s.type==='Frequency Domain'?`
+          <div class="kv"><label>周波数範囲</label><input value="${(s.frange||'')}" oninput="model.study.steps[${idx}].frange=this.value" placeholder="range(f0,df,f1)"/></div>`:''}
+        ${s.type==='Parametric Sweep'?`
+          <div class="kv"><label>Parameter</label><input value="${(s.param||'')}" oninput="model.study.steps[${idx}].param=this.value"></div>
+          <div class="kv"><label>Range/List</label><input value="${(s.range||'')}" oninput="model.study.steps[${idx}].range=this.value"></div>`:''}
+        <div class="section-title">その他パラメータ</div>
+        ${tableGeneric(`step-${idx}`, ['項目','値','備考'],
+          (s.params||[]).map(q=>[q.k,q.v,q.note||'']),
+          (r,c,val)=>{ const q=s.params[r]; ['k','v','note'][c]=val; },
+          ()=>{ (s.params||[]).push({k:'',v:'',note:''}); showContent('study'); },
+          r=>{ s.params.splice(r,1); showContent('study'); })}
+        <div class="small"><button class="row-del" onclick="model.study.steps.splice(${idx},1);showContent('study')">🗑 Step削除</button></div>
+      </div></div>`;
+  });
+  html += panelEnd();
+  main.innerHTML=html;
+}
+function addStep(type){
+  model.study.steps.push({tag:newTag('stp'),type,active:true,params:[],notes:''});
+  showContent('study');
+}
+function renderSolver(main){
+  let html = panel('Solver / Convergence');
+  html += tableGeneric('solver', ['タイプ','線形ソルバー','非線形','前処理','RelTol','AbsTol','MaxIt'],
+    model.study.solver.map(s=>[s.type,s.lin,s.nonlin,s.precond,s.rel,s.abs,s.maxit]),
+    (r,c,v)=>{ const keys=['type','lin','nonlin','precond','rel','abs','maxit']; model.study.solver[r][keys[c]]=v; },
+    ()=>{ model.study.solver.push({type:'',lin:'',nonlin:'',precond:'',rel:'',abs:'',maxit:''}); showContent('solver'); },
+    r=>{ model.study.solver.splice(r,1); showContent('solver'); }
+  );
+  html += panelEnd();
+  main.innerHTML=html;
+}
+
+/* ====== Results ====== */
+function renderResults(main){
+  let html = panel('Results：Datasets / Plot Groups');
+
+  // Datasets
+  html += `<div class="section-title">Datasets</div>
+    <div class="table-actions" style="margin-bottom:8px">${addBtn('＋Dataset追加',"addDataset()")}</div>`;
+  model.results.datasets.forEach((d,idx)=>{
+    html += `<div class="panel">
+      <div class="panel-hd"><div class="panel-title">${d.name} <span class="badge">(${d.tag})</span></div></div>
+      <div class="panel-bd">
+        <div class="kv"><label>Name</label><input value="${d.name}" oninput="model.results.datasets[${idx}].name=this.value"></div>
+        <div class="kv"><label>From Study</label><input value="${d.fromStudy||model.study.tag}" oninput="model.results.datasets[${idx}].fromStudy=this.value"></div>
+        <div class="kv"><label>Note</label><input value="${d.note||''}" oninput="model.results.datasets[${idx}].note=this.value"></div>
+        <div class="small"><button class="row-del" onclick="model.results.datasets.splice(${idx},1);showContent('results')">🗑 Dataset削除</button></div>
+      </div></div>`;
+  });
+
+  // Plot Groups
+  html += `<div class="section-title">Plot Groups</div>
+    <div class="table-actions" style="margin-bottom:8px">${addBtn('＋Plot Group追加',"addPlotGroup()")}</div>`;
+  model.results.plotGroups.forEach((pg,idx)=>{
+    html += `<div class="panel">
+      <div class="panel-hd"><div class="panel-title">${pg.name} <span class="badge">(${pg.tag})</span></div></div>
+      <div class="panel-bd">
+        <div class="kv"><label>Name</label><input value="${pg.name}" oninput="model.results.plotGroups[${idx}].name=this.value"></div>
+        <div class="kv"><label>Dataset</label>
+          <select onchange="model.results.plotGroups[${idx}].datasetTag=this.value">
+            ${model.results.datasets.map(d=>`<option value="${d.tag}" ${pg.datasetTag===d.tag?'selected':''}>${d.name} (${d.tag})</option>`).join('')}
+          </select>
+        </div>
+        <div class="section-title">Plots</div>
+        <div class="table-actions" style="margin-bottom:8px">${addBtn('＋Plot追加',`addPlot(${idx})`)}</div>
+        ${(pg.plots||[]).map((pl,pi)=>`
+          <div class="panel" style="border:1px dashed #e4e9f2">
+            <div class="panel-hd"><div class="panel-title">${pl.type} <span class="badge">(${pl.tag})</span></div></div>
+            <div class="panel-bd">
+              <div class="kv"><label>Type</label><input value="${pl.type}" oninput="model.results.plotGroups[${idx}].plots[${pi}].type=this.value" placeholder="Surface/Line/Arrow等"></div>
+              <div class="kv"><label>Selection（ID）</label><div>${chipsHTML(pl.selection, v=>{pl.selection=v;})}</div></div>
+              <div class="kv"><label>Expression</label><input value="${pl.expr||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].expr=this.value"></div>
+              <div class="kv"><label>Unit</label><input value="${pl.unit||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].unit=this.value"></div>
+              <div class="kv"><label>Note</label><input value="${pl.note||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].note=this.value"></div>
+              <div class="small"><button class="row-del" onclick="model.results.plotGroups[${idx}].plots.splice(${pi},1);showContent('results')">🗑 Plot削除</button></div>
+            </div>
+          </div>
+        `).join('')}
+        <div class="hr"></div>
+        <div class="small"><button class="row-del" onclick="model.results.plotGroups.splice(${idx},1);showContent('results')">🗑 Plot Group削除</button></div>
+      </div></div>`;
+  });
+
+  html += panelEnd();
+  main.innerHTML=html;
+}
+function addDataset(){
+  model.results.datasets.push({tag:newTag('dset'),name:`Solution ${nextId.dset-1}`,fromStudy:model.study.tag,note:''});
+  showContent('results');
+}
+function addPlotGroup(){
+  const d = model.results.datasets[0]?.tag;
+  model.results.plotGroups.push({tag:newTag('pg'),name:`3D Plot Group ${nextId.pg-1}`,datasetTag:d,plots:[]});
+  showContent('results');
+}
+function addPlot(pgIndex){
+  model.results.plotGroups[pgIndex].plots.push({tag:newTag('plt'),type:'Surface',selection:[],expr:'',unit:'',note:''});
+  showContent('results');
+}
+
+/* ====== Derived Values ====== */
+function renderDerived(main){
+  let html = panel('Derived Values');
+  html += `<div class="table-actions" style="margin-bottom:8px">${addBtn('＋Derived追加',"addDerived()")}</div>`;
+  model.results.derived.forEach((d,idx)=>{
+    html += `<div class="panel">
+      <div class="panel-hd"><div class="panel-title">${d.name} <span class="badge">(${d.tag})</span></div></div>
+      <div class="panel-bd">
+        <div class="kv"><label>Name</label><input value="${d.name}" oninput="model.results.derived[${idx}].name=this.value"></div>
+        <div class="kv"><label>Type</label><input value="${d.type}" oninput="model.results.derived[${idx}].type=this.value" placeholder="Point/Line/Surface Average 等"></div>
+        <div class="kv"><label>Selection（ID）</label><div>${chipsHTML(d.selection, v=>{d.selection=v;})}</div></div>
+        <div class="kv"><label>Expression</label><input value="${d.expr||''}" oninput="model.results.derived[${idx}].expr=this.value"></div>
+        <div class="kv"><label>Note</label><input value="${d.note||''}" oninput="model.results.derived[${idx}].note=this.value"></div>
+        <div class="small"><button class="row-del" onclick="model.results.derived.splice(${idx},1);showContent('derived')">🗑 Derived削除</button></div>
+      </div></div>`;
+  });
+  html += panelEnd();
+  main.innerHTML=html;
+}
+function addDerived(){
+  model.results.derived.push({tag:newTag('plt'),name:`Derived ${nextId.plt-1}`,type:'Line Average',selection:[],expr:'',note:''});
+  showContent('derived');
+}
+
+/* ====== 汎用テーブル（行追加/削除） ====== */
+function tableGeneric(id, headers, rows, onCell, onAdd, onDel){
+  const head = headers.map(h=>`<th>${h}</th>`).join('') + '<th></th>';
+  const body = rows.length? rows.map((r,ri)=>`
+    <tr>
+    ${r.map((v,ci)=>`<td><input type="text" value="${v??''}" oninput="(${onCell})(${ri},${ci},this.value)"></td>`).join('')}
+    <td><button class="row-del" onclick="(${onDel})(${ri})">🗑</button></td></tr>`).join('')
+    : `<tr><td colspan="${headers.length+1}" class="small">行がありません。「＋行追加」で追加。</td></tr>`;
+  return `<div class="table-wrap">
+    <div class="table-head"><div class="table-title">${id}</div>
+      <div class="table-actions"><button onclick="(${onAdd})()">＋行追加</button></div></div>
+    <table class="table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+
+/* init */
+updateStats();
+</script>
 </body>
 </html>
