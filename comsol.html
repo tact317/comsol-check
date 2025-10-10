@@ -9,7 +9,10 @@
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;background:#f3f6fb;color:#333}
 .container{display:flex;height:100vh}
 .sidebar{width:340px;background:#fff;border-right:1px solid #dfe3ea;overflow-y:auto;box-shadow:2px 0 5px rgba(0,0,0,.05)}
-.header{background:#1f4e79;color:#fff;padding:16px 18px;font-size:16px;font-weight:700}
+.header{background:#1f4e79;color:#fff;padding:16px 18px;font-size:16px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.header-actions{display:flex;gap:8px}
+.header-btn{background:#2c5aa0;border:1px solid #4a7bb8;color:#fff;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;transition:background .2s}
+.header-btn:hover{background:#3a6bb0}
 .modelroot{padding:10px 18px;color:#1f4e79;font-weight:700;border-bottom:1px solid #eef2f7}
 .category{border-bottom:1px solid #eef2f7}
 .category-header{padding:12px 18px;background:#f7f9fc;cursor:pointer;display:flex;align-items:center;transition:background .15s}
@@ -39,17 +42,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Hiragino Ka
 .small{font-size:12px;color:#8795a8}
 .hr{height:1px;background:#eef2f7;margin:10px 0}
 
-/* Table editor */
 .table-wrap{border:1px solid #e4e9f2;border-radius:8px;overflow:hidden;margin:8px 0;background:#fff}
 .table-head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f7f9fc;border-bottom:1px solid #e4e9f2}
 .table-title{font-weight:700;color:#2c5aa0}
-.table-actions button{border:1px solid #2c5aa0;background:#2c5aa0;color:#fff;font-size:12px;padding:6px 10px;border-radius:6px;cursor:pointer}
+.table-actions button{border:1px solid #2c5aa0;background:#2c5aa0;color:#fff;font-size:12px;padding:6px 10px;border-radius:6px;cursor:pointer;margin-left:4px}
+.table-actions button:hover{background:#3a6bb0}
 .table{width:100%;border-collapse:collapse}
 .table th,.table td{border-bottom:1px solid #eef2f7;padding:8px 10px;font-size:13px;vertical-align:top}
 .table th{background:#fafcff;text-align:left;color:#556}
 .table td input,.table td textarea,.table td select{width:100%;padding:6px;border:1px solid #d9e0ea;border-radius:6px;font-size:13px;font-family:Consolas,Monaco,monospace}
 .table td textarea{min-height:44px;resize:vertical}
 .row-del{cursor:pointer;border:none;background:transparent;font-size:18px;line-height:1;color:#b00020}
+.row-del:hover{color:#d32f2f}
 .switch{position:relative;display:inline-block;width:38px;height:22px}
 .switch input{display:none}
 .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#cdd7e6;transition:.2s;border-radius:22px}
@@ -57,23 +61,51 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Hiragino Ka
 input:checked + .slider{background:#2c5aa0}
 input:checked + .slider:before{transform:translateX(16px)}
 
-/* Selection chips */
 .chips{display:flex;gap:6px;flex-wrap:wrap;border:1px solid #d9e0ea;border-radius:6px;padding:6px}
 .chip{background:#eef5ff;color:#1f4e79;border-radius:12px;padding:3px 8px;font-size:12px}
 .chips input{border:none;outline:none;min-width:120px}
 
-/* Footer stats */
 .stats{background:#fff;padding:12px 16px;border-top:1px solid #dfe3ea;position:sticky;bottom:0}
 .stat-row{display:flex;justify-content:space-between;font-size:12px}
 .progress-bar{position:fixed;bottom:0;left:0;right:0;height:4px;background:#e0e6ef;z-index:1000}
 .progress-fill{height:100%;background:linear-gradient(90deg,#1f4e79,#4caf50);transition:width .25s;width:0%}
+
+.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.modal-content{background:#fff;border-radius:12px;padding:24px;max-width:500px;width:90%;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.modal-title{font-size:18px;font-weight:700;color:#1f4e79;margin-bottom:16px}
+.modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+.btn{padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px;border:none}
+.btn-primary{background:#2c5aa0;color:#fff}
+.btn-primary:hover{background:#3a6bb0}
+.btn-secondary{background:#e0e6ef;color:#333}
+.btn-secondary:hover{background:#d0d8e5}
+
+.toast{position:fixed;top:20px;right:20px;background:#2c5aa0;color:#fff;padding:12px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:3000;display:none;animation:slideIn .3s ease}
+.toast.show{display:block}
+@keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+@media print{
+  .sidebar,.header-actions,.progress-bar,.table-actions button,.row-del{display:none!important}
+  .container{display:block;height:auto}
+  .main-content{padding:0;display:block}
+  .details{max-width:100%;min-width:100%}
+  .panel{page-break-inside:avoid;box-shadow:none;border:1px solid #ccc}
+  body{background:#fff}
+}
 </style>
 </head>
 <body>
 <div class="container">
-
   <div class="sidebar">
-    <div class="header">Model Builder</div>
+    <div class="header">
+      <span>Model Builder</span>
+      <div class="header-actions">
+        <button class="header-btn" onclick="exportJSON()" title="JSONでエクスポート">💾</button>
+        <button class="header-btn" onclick="importJSON()" title="JSONをインポート">📂</button>
+        <button class="header-btn" onclick="exportPDF()" title="PDFで出力">📄</button>
+      </div>
+    </div>
     <div class="modelroot">モデル（Model 1）</div>
 
     <div class="category">
@@ -130,7 +162,11 @@ input:checked + .slider:before{transform:translateX(16px)}
     <div class="details" id="main">
       <div class="panel">
         <div class="panel-hd"><div class="panel-title">COMSOL設定管理（COMSOL風）</div></div>
-        <div class="panel-bd small">左のツリーからノードを選択すると、右側に「Settings」風の編集UIが表示されます。ブロックの <b>Active</b> トグル、(tag) 自動採番、Selectionチップ、Unit列、Studyのステップ、ResultsのPlot Group/Dataset などを実装しています。</div>
+        <div class="panel-bd small">
+          左のツリーからノードを選択すると、右側に「Settings」風の編集UIが表示されます。<br>
+          <b>データ保存：</b>ヘッダーの💾ボタンでJSONファイルをダウンロード、📂ボタンで読み込み、📄ボタンでPDF出力できます。<br>
+          <b>自動保存：</b>ブラウザに自動的に保存されます（同じブラウザで開けば復元されます）。
+        </div>
       </div>
     </div>
   </div>
@@ -138,22 +174,30 @@ input:checked + .slider:before{transform:translateX(16px)}
 
 <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
 
+<div class="modal" id="import-modal">
+  <div class="modal-content">
+    <div class="modal-title">JSONファイルをインポート</div>
+    <input type="file" id="file-input" accept=".json" style="width:100%;padding:10px;border:1px solid #d9e0ea;border-radius:6px">
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">キャンセル</button>
+      <button class="btn btn-primary" onclick="loadJSONFile()">読み込み</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-/* ================================
-   タグ自動採番
-================================ */
 const nextId = {
   param:1, var:1, fn:1,
-  blk:1, cyl:1, dif:1, arr:1, // geometry features（例）
+  blk:1, cyl:1, dif:1, arr:1,
   mat:1, bc:1, mesh:1,
   stp:1, dset:1, pg:1, plt:1,
   mfh:1, ec:1, ht:1
 };
 function newTag(prefix){ return prefix + (nextId[prefix]++); }
 
-/* ================================
-   進捗（チェック項目）
-================================ */
 let checkStates = {}, inputValues = {};
 function initChecks(id, items=[]){
   checkStates[id] = items.map(()=>false);
@@ -174,9 +218,6 @@ function updateStats(){
   document.getElementById('progress-fill').style.width=p+'%';
 }
 
-/* ================================
-   Selection chips
-================================ */
 function parseRanges(str){
   const out=[];
   (str||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(tok=>{
@@ -192,144 +233,231 @@ function chipsHTML(values, onChange){
   const id = 'chips-'+Math.random().toString(36).slice(2);
   setTimeout(()=>{
     const input = document.querySelector(`#${id}`);
-    input.addEventListener('change', e=>{
+    if(input) input.addEventListener('change', e=>{
       onChange(parseRanges(e.target.value));
-      showContent(currentId); // 再描画
+      showContent(currentId);
+      autoSave();
     });
   },0);
   return `<div class="chips">${nodes}<input id="${id}" placeholder="例：1,2,5-8"/></div>`;
 }
 
-/* ================================
-   データモデル
-================================ */
 const model = {
   global:{
-    parameters:[], // {tag,name,expr,unit,desc}
-    variables:[],  // {tag,name,expr,unit,note}
-    functions:[]   // {tag,fname,args,expr,unit,type, points:[{arg,val}]}
+    parameters:[],
+    variables:[],
+    functions:[]
   },
   comp1:{
-    geometry:{ features:[] }, // {tag,type,name,params:[]}
-    materials:[], // {tag,name,active:true, selection:[], props:[]}
-    physics:[],   // {tag,name,active:true,type, selection:[], params:[]}
-    mesh:{ features:[] } // {tag,name,type,active,selection:[], params:[]}
+    geometry:{ features:[] },
+    materials:[],
+    physics:[],
+    mesh:{ features:[] }
   },
   study:{
     tag:'std1', name:'Study 1',
-    steps:[], // {tag,type,active,params:[], notes:''}
-    solver:[ // simple sheet
-      {type:'Linear/Nonlinear', lin:'', nonlin:'', precond:'', rel:'', abs:'', maxit:''}
-    ]
+    steps:[],
+    solver:[]
   },
   results:{
-    datasets:[],    // {tag,name,fromStudy:'std1',note:''}
-    plotGroups:[],  // {tag,name,datasetTag,plots:[{tag,type,selection:[],expr,unit,note}]}
-    derived:[]      // {tag,name,type,selection:[],expr,note}
+    datasets:[],
+    plotGroups:[],
+    derived:[]
   }
 };
 
-/* ====== 初期ノード（<< ここにデフォルト値を設定 >>） ====== */
 function seed(){
-  // Global Definitions - Parameters
+  // --- Global Definitions: Parameters ---
   model.global.parameters.push(
-    {tag:newTag('param'),name:'gap',expr:'4',unit:'mm',desc:'バルク間距離'},
-    {tag:newTag('param'),name:'radius_bulk',expr:'15',unit:'mm',desc:'バルク直径'},
-    {tag:newTag('param'),name:'thickness_bulk',expr:'5',unit:'mm',desc:'バルク厚み'},
-    {tag:newTag('param'),name:'lambda',expr:'10',unit:'mm',desc:'周期長'},
-    {tag:newTag('param'),name:'magnetization',expr:'1000',unit:'s',desc:'磁化時間'},
-    {tag:newTag('param'),name:'relaxation_time',expr:'1000',unit:'s',desc:''},
-    {tag:newTag('param'),name:'* Dy2',expr:'1',unit:'mm',desc:'リング直線部のy方向長さ'},
-    {tag:newTag('param'),name:'Dz2',expr:'lambda-thickness_bulk-g_C*4',unit:'mm',desc:'リング直線部のz方向長さ'},
-    {tag:newTag('param'),name:'* J_c_param',expr:'10',unit:'kA/mm^2',desc:'臨界電流密度'},
-    {tag:newTag('param'),name:'Bs_time',expr:'5000',unit:'s',desc:'ヒステリシス解析時の時間'},
-    {tag:newTag('param'),name:'* Bs',expr:'5',unit:'T',desc:'外部磁場'},
-    {tag:newTag('param'),name:'Bs_min',expr:'-5',unit:'T',desc:'ヒステリシス解析時の最小磁場'},
-    {tag:newTag('param'),name:'Bs_max',expr:'5',unit:'T',desc:'ヒステリシス解析時の最大磁場'}
+    {tag:newTag('param'), name:'gap', expr:'4', unit:'mm', desc:'バルク間距離'},
+    {tag:newTag('param'), name:'radius_bulk', expr:'15', unit:'mm', desc:'バルク直径'},
+    {tag:newTag('param'), name:'thickness_bulk', expr:'5', unit:'mm', desc:'バルク厚み'},
+    {tag:newTag('param'), name:'lambda', expr:'10', unit:'mm', desc:'周期長'},
+    {tag:newTag('param'), name:'magnetization', expr:'1000', unit:'s', desc:'磁化時間'},
+    {tag:newTag('param'), name:'relaxation_time', expr:'1000', unit:'s', desc:''},
+    {tag:newTag('param'), name:'* Dy2', expr:'1', unit:'mm', desc:'リング直線部のy方向長さ'},
+    {tag:newTag('param'), name:'Dz2', expr:'lambda-thickness_bulk-g_C*4', unit:'mm', desc:'リング直線部のz方向長さ'},
+    {tag:newTag('param'), name:'* J_c_param', expr:'10', unit:'kA/mm^2', desc:'臨界電流密度'},
+    {tag:newTag('param'), name:'Bs_time', expr:'5000', unit:'s', desc:'ヒステリシス解析時の時間'},
+    {tag:newTag('param'), name:'* Bs', expr:'5', unit:'T', desc:'外部磁場'},
+    {tag:newTag('param'), name:'Bs_min', expr:'-5', unit:'T', desc:'ヒステリシス解析時の最小磁場'},
+    {tag:newTag('param'), name:'Bs_max', expr:'5', unit:'T', desc:'ヒステリシス解析時の最大磁場'}
   );
 
-  // Global Definitions - Variables
+  // --- Global Definitions: Variables ---
   model.global.variables.push(
-    {tag:newTag('var'),name:'VECT_normJ',expr:'sqrt((mfh.Jx+eps)^2+(mfh.Jy+eps)^2+(mfh.Jz+eps)^2)',unit:'A/m^2',note:''},
-    {tag:newTag('var'),name:'* n',expr:'21',unit:'',note:'収束するようにして統一'},
-    {tag:newTag('var'),name:'E_c',expr:'0.0001',unit:'V/m',note:''},
-    {tag:newTag('var'),name:'rho_SC',expr:'E_c*(1/VECT_norm)*abs((VECT_normJ/J_c^n))',unit:'',note:''},
-    {tag:newTag('var'),name:'rho_AIR',expr:'1',unit:'Ω*m',note:''},
-    {tag:newTag('var'),name:'* H_ext',expr:'int2(t)/mu0_const',unit:'',note:'条件によって関数名を変更'},
-    {tag:newTag('var'),name:'J_c',expr:'J_c_param',unit:'',note:''}
+    {tag:newTag('var'), name:'VECT_normJ', expr:'sqrt((mfh.Jx+eps)^2+(mfh.Jy+eps)^2+(mfh.Jz+eps)^2)', unit:'A/m^2', note:''},
+    {tag:newTag('var'), name:'* n', expr:'21', unit:'', note:'収束するようにして統一'},
+    {tag:newTag('var'), name:'E_c', expr:'0.0001', unit:'V/m', note:''},
+    {tag:newTag('var'), name:'rho_SC', expr:'E_c*(1/VECT_norm)*abs((VECT_normJ/J_c^n))', unit:'', note:''},
+    {tag:newTag('var'), name:'rho_AIR', expr:'1', unit:'Ω*m', note:''},
+    {tag:newTag('var'), name:'* H_ext', expr:'int2(t)/mu0_const', unit:'', note:'条件によって関数名を変更'},
+    {tag:newTag('var'), name:'J_c', expr:'J_c_param', unit:'', note:''}
   );
 
-  // Global Definitions - Functions
-  model.global.functions.push({
-    tag:newTag('fn'), fname:'int2', args:'t', type:'Interpolation',
-    points:[
-      {arg:'0', val:'-Bs'},
-      {arg:'magnetization_time', val:'Bs'},
-      {arg:'magnetization_time+relaxation_time', val:'Bs'}
-    ]
-  });
-  model.global.functions.push({
-    tag:newTag('fn'), fname:'int3', args:'t', type:'Interpolation',
-    points:[
-      {arg:'0', val:'(Bs_min+Bs_max)/2'},
-      {arg:'1000', val:'Bs_max'},
-      {arg:'2000', val:'(Bs_min+Bs_max)/2'},
-      {arg:'3000', val:'Bs_min'},
-      {arg:'4000', val:'(Bs_min+Bs_max)/2'},
-      {arg:'5000', val:'Bs_max'}
-    ]
-  });
-
-  // Materials
-  model.comp1.materials.push(
-    {tag:newTag('mat'),name:'AIR',active:true,selection:[],props:[{prop:'ドメイン',val:'全部',unit:''}]},
-    {tag:newTag('mat'),name:'SC1',active:true,selection:[],props:[{prop:'ドメイン',val:'バルク',unit:''}]},
-    {tag:newTag('mat'),name:'SC2',active:true,selection:[],props:[{prop:'ドメイン',val:'リング',unit:''}]}
-  );
-
-  // Physics
-  model.comp1.physics.push(
-    {tag:newTag('mfh'),name:'AIR',type:'境界条件',active:true,selection:[],params:[{k:'領域',v:'表面'}]},
-    {tag:newTag('mfh'),name:'M_insu',type:'境界条件',active:true,selection:[],params:[{k:'領域',v:'断面部分'}]},
-    {tag:newTag('mfh'),name:'Initial Values',type:'初期値',active:true,selection:[],params:[{k:'領域',v:'全部'}]},
-    {tag:newTag('mfh'),name:'Superconductor',type:'ドメイン設定',active:true,selection:[],params:[{k:'領域',v:'バルク, リング'}]},
-    {tag:newTag('mfh'),name:'Magnetic Field',type:'ドメイン設定',active:true,selection:[],params:[{k:'領域',v:'断面でない部分'}]}
+  // --- Global Definitions: Functions ---
+  // The app's table format doesn't support piecewise functions well,
+  // so we describe them in a readable format in the expression field.
+  model.global.functions.push(
+    {tag:newTag('fn'), fname:'int2', args:'t', expr:'(t=0 -> -Bs), (t<=mag_time -> Bs), (t>mag_time -> Bs)', unit:'', type:'Piecewise'},
+    {tag:newTag('fn'), fname:'int3', args:'t', expr:'(t=0 -> (min+max)/2), (t<=1000 -> max), (t<=2000 -> (min+max)/2), (t<=3000 -> min), (t<=4000 -> (min+max)/2), (t<=5000 -> max)', unit:'', type:'Piecewise'}
   );
   
-  // Mesh
+  // --- Components: Materials ---
+  model.comp1.materials.push(
+    {tag:newTag('mat'), name:'AIR', active:true, selection:[], props:[{prop:'適用ドメイン', val:'全部', unit:''}]},
+    {tag:newTag('mat'), name:'SC1', active:true, selection:[], props:[{prop:'適用ドメイン', val:'バルク', unit:''}]},
+    {tag:newTag('mat'), name:'SC2', active:true, selection:[], props:[{prop:'適用ドメイン', val:'リング', unit:''}]}
+  );
+  
+  // --- Components: Physics ---
+  // Using params table to describe the regions as selection IDs are not specified.
+  model.comp1.physics.push(
+    {tag:newTag('mfh'), name:'AIR', type:'mfh', active:true, selection:[], params:[{k:'適用領域', v:'表面'}]},
+    {tag:newTag('mfh'), name:'M_insu', type:'mfh', active:true, selection:[], params:[{k:'適用領域', v:'断面部分'}]},
+    {tag:newTag('mfh'), name:'initial', type:'mfh', active:true, selection:[], params:[{k:'適用領域', v:'全部'}]},
+    {tag:newTag('mfh'), name:'SC', type:'mfh', active:true, selection:[], params:[{k:'適用領域', v:'バルク, リング'}]},
+    {tag:newTag('mfh'), name:'M_field', type:'mfh', active:true, selection:[], params:[{k:'適用領域', v:'断面でない部分'}]}
+  );
+  
+  // --- Components: Mesh ---
   model.comp1.mesh.features.push(
-    {tag:newTag('mesh'),name:'ビーム Mapped',type:'Mapped',active:true,selection:[],params:[{k:'横分割',v:'1'},{k:'縦分割',v:'2'}]},
-    {tag:newTag('mesh'),name:'ビーム Swept',type:'Swept',active:true,selection:[],params:[{k:'要素数',v:'50'}]},
-    {tag:newTag('mesh'),name:'バルク Size',type:'Size',active:true,selection:[],params:[{k:'要素サイズ',v:'0.001[m]'}]},
-    {tag:newTag('mesh'),name:'リング Size',type:'Size',active:true,selection:[],params:[{k:'要素サイズ',v:'0.001[m]'}]},
-    {tag:newTag('mesh'),name:'空気 Size',type:'Size',active:true,selection:[],params:[{k:'ドメイン',v:'残りの領域'}]}
+    {tag:newTag('mesh'), name:'ビーム', type:'Mapped/Swept', active:true, selection:[], params:[
+      {k:'Mapped', v:'横1, 縦2'}, {k:'Swept', v:'50'}
+    ]},
+    {tag:newTag('mesh'), name:'バルク', type:'Free Tetrahedral', active:true, selection:[], params:[
+      {k:'要素サイズ(SC)', v:'0.001', note:'m'}
+    ]},
+    {tag:newTag('mesh'), name:'リング', type:'Free Tetrahedral', active:true, selection:[], params:[
+      {k:'要素サイズ(SC1)', v:'0.001', note:'m'}
+    ]},
+    {tag:newTag('mesh'), name:'空気', type:'Free Tetrahedral', active:true, selection:[], params:[
+      {k:'要素サイズ(AIR)', v:'残りの領域'}
+    ]}
   );
 
-  // Study
+  // --- Study ---
   model.study.steps.push(
-    {tag:newTag('stp'),type:'Parametric Sweep',active:true, name:'Jc sweep', params:[{k:'Parameter', v:'J_c_param'}, {k:'パターン数', v:'8'}]},
-    {tag:newTag('stp'),type:'Time Dependent',active:true, name:'Jc time', tlist:'range(0, (magnetization_time+relaxation_time)/100, magnetization_time+relaxation_time)'},
-    {tag:newTag('stp'),type:'Parametric Sweep',active:true, name:'Dy2 sweep', params:[{k:'Parameter', v:'Dy2'}, {k:'パターン数', v:'9'}, {k:'単位', v:'mm'}]},
-    {tag:newTag('stp'),type:'Time Dependent',active:true, name:'Dy2 time', tlist:'range(0, (magnetization_time+relaxation_time)/100, magnetization_time+relaxation_time)'},
-    {tag:newTag('stp'),type:'Time Dependent',active:true, name:'Bs time', tlist:'range(0, Bs_time/50, Bs_time)', params:[{k:'パターン数', v:'5'}]}
+    {tag:newTag('stp'), type:'Parametric Sweep', active:true, params:[
+      {k:'スイープ変数', v:'Jc'}, {k:'パターン数', v:'8'}
+    ], notes:'Time Dependentも併用。Range: 0 to magnetization_time+relaxation_time, Step: (mag_time+relax_time)/100'},
+    {tag:newTag('stp'), type:'Parametric Sweep', active:true, params:[
+      {k:'スイープ変数', v:'Dy2 [mm]'}, {k:'パターン数', v:'9'}
+    ], notes:'Time Dependentも併用。その他はJcと同様'},
+    {tag:newTag('stp'), type:'Time Dependent', active:true, tlist:'range(0, Bs_time/50, Bs_time)', params:[
+      {k:'解析対象', v:'Bs'}
+    ], notes:'パターン数: 5'}
+  );
+  
+  // --- Solver ---
+  model.study.solver.push(
+      {type:'Time Stepping', lin:'Direct', nonlin:'Fully Coupled', precond:'', rel:'', abs:'', maxit:'', note:'時間ステッピングの非線形コントローラーをチェック'}
   );
 
-  // Solver Settings
-  model.study.solver = [
-      {type:'メモ', lin:'時間ステッピングの非線形コントローラーをチェック', nonlin:'', precond:'', rel:'', abs:'', maxit:''},
-      {type:'メモ', lin:'強連成', nonlin:'直接', precond:'', rel:'', abs:'', maxit:''}
-    ];
-
-  // Results are cleared as requested
-  model.results.datasets = [];
-  model.results.plotGroups = [];
-  model.results.derived = [];
+  // --- Results (Default placeholders) ---
+  const d1 = {tag:newTag('dset'),name:'Solution 1',fromStudy:model.study.tag,note:''};
+  model.results.datasets.push(d1);
+  const pg1 = {tag:newTag('pg'),name:'3D Plot Group 1',datasetTag:d1.tag,plots:[
+    {tag:newTag('plt'),type:'Surface',selection:[],expr:'',unit:'',note:''}
+  ]};
+  model.results.plotGroups.push(pg1);
+  model.results.derived.push({tag:newTag('plt'),name:'Line Average 1',type:'Line Average',selection:[],expr:'',note:''});
 }
-seed();
 
-/* ================================
-   レンダリング
-================================ */
+
+// 自動保存・復元
+function autoSave(){
+  try{
+    const data = JSON.stringify({model, nextId});
+    localStorage.setItem('comsol_model', data);
+  }catch(e){
+    console.warn('Auto-save failed:', e);
+  }
+}
+
+function autoLoad(){
+  try{
+    const data = localStorage.getItem('comsol_model');
+    if(data){
+      const parsed = JSON.parse(data);
+      Object.assign(model, parsed.model);
+      Object.assign(nextId, parsed.nextId);
+      showToast('前回のデータを復元しました');
+      return true;
+    }
+  }catch(e){
+    console.warn('Auto-load failed:', e);
+  }
+  return false;
+}
+
+// JSONエクスポート
+function exportJSON(){
+  const data = JSON.stringify({model, nextId}, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `comsol_model_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('JSONファイルをダウンロードしました');
+}
+
+// JSONインポート
+function importJSON(){
+  document.getElementById('import-modal').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('import-modal').classList.remove('show');
+}
+
+function loadJSONFile(){
+  const file = document.getElementById('file-input').files[0];
+  if(!file){
+    alert('ファイルを選択してください');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const parsed = JSON.parse(e.target.result);
+      Object.assign(model, parsed.model);
+      Object.assign(nextId, parsed.nextId);
+      closeModal();
+      showContent(currentId || 'parameters');
+      autoSave();
+      showToast('データを読み込みました');
+    }catch(err){
+      alert('JSONの読み込みに失敗しました: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// PDF出力
+function exportPDF(){
+  showToast('PDF生成中...');
+  setTimeout(()=>{
+    window.print();
+    showToast('印刷ダイアログを開きました');
+  }, 100);
+}
+
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 3000);
+}
+
+// 初期化
+if(!autoLoad()){
+  seed();
+  autoSave();
+}
+
 let currentId = null;
 function toggleCategory(el){
   const subs = el.nextElementSibling;
@@ -354,19 +482,18 @@ function showContent(id){
   if(id==='derived')    return renderDerived(main);
 }
 
-/* ====== 共通UI小物 ====== */
-function panel(title,tag){ return `
-  <div class="panel"><div class="panel-hd">
-    <div class="panel-title">${title}${tag?` <span class="badge">(${tag})</span>`:''}</div>
-  </div><div class="panel-bd">`; }
-function panelEnd(){ return `</div></div>`; }
+function panel(title,tag){ return   `<div class="panel"><div class="panel-hd">
+    <div class="panel-title">${title}${tag? `<span class="badge">(${tag})</span>`:''}</div>
+  </div><div class="panel-bd">`; }function panelEnd(){ return `</div></div>`; }
 function addBtn(label,onclick){ return `<button onclick="${onclick}">${label}</button>`; }
 function activeToggleHTML(obj, path){
   const id='sw-'+Math.random().toString(36).slice(2);
   setTimeout(()=>{
     const el=document.getElementById(id);
-    el.checked = !!obj.active;
-    el.onchange = ()=>{ obj.active = el.checked; };
+    if(el){
+      el.checked = !!obj.active;
+      el.onchange = ()=>{ obj.active = el.checked; autoSave(); };
+    }
   },0);
   return `<label class="small">Active</label> <label class="switch"><input id="${id}" type="checkbox"><span class="slider"></span></label>`;
 }
@@ -375,14 +502,13 @@ function unitSplit(expr){
   return m? {v:m[1],u:m[2]} : {v:expr,u:''};
 }
 
-/* ====== Parameters / Variables ====== */
 function renderParameters(main){
   let html = panel('Parameters（パラメータ）');
   html += tableSimple('parameters','param',
     [{key:'name',label:'Name'},{key:'expr',label:'Expression'},{key:'unit',label:'Unit'},{key:'desc',label:'Description'}],
     model.global.parameters,
-    (row,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); row.expr=p.v; if(!row.unit) row.unit=p.u; } else { row[k]=v; } showContent('parameters'); },
-    ()=> model.global.parameters.push({tag:newTag('param'),name:'',expr:'',unit:'',desc:''})
+    (row,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); row.expr=p.v; if(!row.unit) row.unit=p.u; } row[k]=v; autoSave(); },
+    ()=>{ model.global.parameters.push({tag:newTag('param'),name:'',expr:'',unit:'',desc:''}); autoSave(); }
   );
   html += panelEnd();
   main.innerHTML = html;
@@ -392,8 +518,19 @@ function renderVariables(main){
   html += tableSimple('variables','var',
     [{key:'name',label:'Name'},{key:'expr',label:'Expression'},{key:'unit',label:'Unit'},{key:'note',label:'Note'}],
     model.global.variables,
-    (r,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); r.expr=p.v; if(!r.unit) r.unit=p.u; } else { r[k]=v; } showContent('variables'); },
-    ()=> model.global.variables.push({tag:newTag('var'),name:'',expr:'',unit:'',note:''})
+    (r,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); r.expr=p.v; if(!r.unit) r.unit=p.u; } r[k]=v; autoSave(); },
+    ()=>{ model.global.variables.push({tag:newTag('var'),name:'',expr:'',unit:'',note:''}); autoSave(); }
+  );
+  html += panelEnd();
+  main.innerHTML = html;
+}
+function renderFunctions(main){
+  let html = panel('Functions（関数）');
+  html += tableSimple('functions','fn',
+    [{key:'fname',label:'Name'},{key:'args',label:'Arguments'},{key:'expr',label:'Expression'},{key:'unit',label:'Unit'},{key:'type',label:'Type'}],
+    model.global.functions,
+    (r,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); r.expr=p.v; if(!r.unit) r.unit=p.u; } r[k]=v; autoSave(); },
+    ()=>{ model.global.functions.push({tag:newTag('fn'),fname:'',args:'',expr:'',unit:'',type:'Analytic'}); autoSave(); }
   );
   html += panelEnd();
   main.innerHTML = html;
@@ -403,19 +540,16 @@ function tableSimple(contentId, prefix, columns, rows, onChange, onAdd){
   const body = rows.map((row,i)=>{
     const tds = columns.map(c=>{
       const val=row[c.key]??'';
-      return `<td><input type="text" value="${val}" oninput="(${onChange.name})(modelPath('${contentId}')[${i}],'${c.key}',this.value)"></td>`;
+      return `<td><input type="text" value="${val}" oninput="(${onChange})(modelPath('${contentId}')[${i}],'${c.key}',this.value)"></td>`;
     }).join('');
-    return `<tr>${tds}<td class="small">${row.tag||''}</td>
-      <td><button class="row-del" onclick="modelPath('${contentId}').splice(${i},1);showContent('${contentId}')">🗑</button></td></tr>`;
+    return `<tr>${tds}<td class="small">${row.tag||''}</td>      <td><button class="row-del" onclick="modelPath('${contentId}').splice(${i},1);showContent('${contentId}');autoSave()">🗑</button></td></tr>`;
   }).join('') || `<tr><td colspan="${columns.length+2}" class="small">行がありません。「＋行追加」で追加。</td></tr>`;
-  const addCall = `(${onAdd.name})();showContent('${contentId}')`;
-  return `
-  <div class="table-wrap">
+  const addCall = `(${onAdd})();showContent('${contentId}');`;
+  return   `<div class="table-wrap">
     <div class="table-head"><div class="table-title">${prefix.toUpperCase()}</div>
       <div class="table-actions"><button onclick="${addCall}">＋行追加</button></div></div>
     <table class="table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>
-  </div>`;
-}
+  </div>`;}
 function modelPath(id){
   switch(id){
     case 'parameters': return model.global.parameters;
@@ -425,146 +559,58 @@ function modelPath(id){
   return [];
 }
 
-/* ====== Functions (Customized) ====== */
-function renderFunctions(main) {
-    let html = panel('Functions（関数）');
-    model.global.functions.forEach((fn, idx) => {
-        html += `<div class="panel" style="border:1px solid #eaeef6">
-            <div class="panel-hd">
-                <div class="panel-title">${fn.fname} <span class="badge">(${fn.tag})</span></div>
-                <div style="margin-left:auto"><button class="row-del" onclick="model.global.functions.splice(${idx},1);showContent('functions')">🗑 関数削除</button></div>
-            </div>
-            <div class="panel-bd">
-                <div class="kv"><label>Function Name</label><input value="${fn.fname}" oninput="model.global.functions[${idx}].fname=this.value"></div>
-                <div class="kv"><label>Arguments</label><input value="${fn.args}" oninput="model.global.functions[${idx}].args=this.value"></div>
-                <div class="kv"><label>Type</label><input value="${fn.type}" oninput="model.global.functions[${idx}].type=this.value"></div>
-                ${fn.type === 'Interpolation' ? `
-                    <div class="section-title">Data Points</div>
-                    <div class="table-wrap">
-                        <table class="table">
-                            <thead><tr><th>Argument (${fn.args})</th><th>Value</th><th></th></tr></thead>
-                            <tbody>
-                                ${(fn.points || []).map((p, p_idx) => `
-                                    <tr>
-                                        <td><input value="${p.arg}" oninput="model.global.functions[${idx}].points[${p_idx}].arg=this.value"></td>
-                                        <td><input value="${p.val}" oninput="model.global.functions[${idx}].points[${p_idx}].val=this.value"></td>
-                                        <td><button class="row-del" onclick="model.global.functions[${idx}].points.splice(${p_idx},1);showContent('functions')">🗑</button></td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                ` : `
-                    <div class="kv"><label>Expression</label><input value="${fn.expr || ''}" oninput="model.global.functions[${idx}].expr=this.value"></div>
-                `}
-            </div>
-        </div>`;
-    });
-    html += panelEnd();
-    main.innerHTML = html;
-}
-
-/* ====== Geometry (Customized) ====== */
+// Special render function for Geometry to show user's custom table
 function renderGeometry(main){
   let html = panel('Geometry（comp1/geom1）');
-
-  // Analysis Patterns Table
-  html += `<div class="section-title">解析パターン概要</div>
-    <div class="table-wrap">
-      <table class="table">
-        <thead><tr><th>項目</th><th>リング数</th><th>周期</th><th>カット</th><th>解析パターン</th></tr></thead>
-        <tbody>
-          <tr><td>1</td><td>2</td><td>1</td><td>×</td><td>Jc, Dy2, Bs</td></tr>
-          <tr><td>2</td><td>2</td><td>1</td><td>○</td><td>(同上)</td></tr>
-          <tr><td>3</td><td>2</td><td>0.5</td><td>×</td><td>(同上)</td></tr>
-          <tr><td>4</td><td>2</td><td>0.5</td><td>○</td><td>(同上)</td></tr>
-          <tr><td>5</td><td>1</td><td>1</td><td>×</td><td>(同上)</td></tr>
-          <tr><td>6</td><td>1</td><td>1</td><td>○</td><td>(同上)</td></tr>
-        </tbody>
-      </table>
-    </div>`;
-
-  // Checkpoints Table
-  html += `<div class="section-title">形状ごとの変更点チェック</div>
-    <div class="table-wrap">
-      <table class="table">
-        <thead><tr><th>条件</th><th>変更内容</th></tr></thead>
-        <tbody>
-          <tr><td>カットが○</td><td>ポリゴン2種の3,7点のy座標</td></tr>
-          <tr><td>周期 0.5</td><td>線分の長さ: lambda/2, ポイント数: 1, 座標: (0,0,0)</td></tr>
-          <tr><td>周期 1</td><td>線分の長さ: lambda, ポイント数: 2, 座標: (0,0,lambda/4), (0,0,-lambda/4)</td></tr>
-        </tbody>
-      </table>
-    </div><div class="hr"></div>`;
-
-  html += `<div class="section-title">Features</div>
-    <div class="small">以下に具体的なジオメトリ形状（ブロック、円柱など）を追加します。</div>
-    <div class="hr"></div>
-    <div class="table-actions" style="margin-bottom:8px">
-      ${addBtn('＋Blockを追加', "addGeom('Block')")}
-      ${addBtn('＋Cylinderを追加', "addGeom('Cylinder')")}
-      ${addBtn('＋Differenceを追加', "addGeom('Difference')")}
-    </div>`;
-  model.comp1.geometry.features.forEach((f,idx)=>{
-    html += `<div class="panel" style="border:1px solid #eaeef6">
-      <div class="panel-hd"><div class="panel-title">${f.name} <span class="badge">(${f.tag})</span></div></div>
-      <div class="panel-bd">
-        <div class="section-title">Parameters</div>
-        ${tableKV(`geom-${idx}`, f.params, (i,p)=>{ f.params[i]=p; }, ( )=>{
-          f.params.push({k:'',v:'',u:''}); showContent('geometry');
-        })}
-        <div class="hr"></div>
-        <div class="small"><button class="row-del" onclick="model.comp1.geometry.features.splice(${idx},1);showContent('geometry')">🗑 削除</button></div>
-      </div></div>`;
-  });
+  html += `<div class="section-title">形状パターン</div>`;
+  html += `<div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>No.</th><th>リング数</th><th>周期</th><th>カット</th><th>解析パターン</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>2</td><td>1</td><td>×</td><td>Jc, Dy2, Bs</td></tr>
+        <tr><td>2</td><td>2</td><td>1</td><td>○</td><td>(同上)</td></tr>
+        <tr><td>3</td><td>2</td><td>0.5</td><td>×</td><td>(同上)</td></tr>
+        <tr><td>4</td><td>2</td><td>0.5</td><td>○</td><td>(同上)</td></tr>
+        <tr><td>5</td><td>1</td><td>1</td><td>×</td><td>(同上)</td></tr>
+        <tr><td>6</td><td>1</td><td>1</td><td>○</td><td>(同上)</td></tr>
+      </tbody>
+    </table>
+  </div>`;
+  html += `<div class="section-title">形状ごとによる変更点チェック</div>`;
+  html += `<div class="panel-bd small" style="line-height:1.6;">
+    - <b>カットが○の場合:</b><br>
+      ポリゴン2種の3,7点のy座標を修正<br>
+    - <b>周期が0.5の場合:</b><br>
+      線分の長さ: lambda/2<br>
+      ポイント数: 1<br>
+      座標: (x,y,z)=(0,0,0)<br>
+    - <b>周期が1の場合:</b><br>
+      線分の長さ: lambda<br>
+      ポイント数: 2<br>
+      座標1: (x1,y1,z1)=(0,0,lambda/4)<br>
+      座標2: (x2,y2,z2)=(0,0,-lambda/4)
+  </div>`;
   html += panelEnd();
   main.innerHTML = html;
 }
 
-function addGeom(type){
-  const mapTag = {Block:'blk',Cylinder:'cyl',Difference:'dif'};
-  const tag = newTag(mapTag[type]||'blk');
-  model.comp1.geometry.features.push({tag,type,name:`${type} ${nextId[mapTag[type]]-1}`,params:[]});
-  showContent('geometry');
-}
-function tableKV(id, rows, onChange, onAdd){
-    const body = (rows || []).map((r, i) => `
-        <tr>
-            <td><input type="text" value="${r.k || ''}" oninput="${onChange.name}(${i}, {k:this.value,v:'${r.v || ''}',u:'${r.u || ''}'})"></td>
-            <td><input type="text" value="${r.v || ''}" oninput="${onChange.name}(${i}, {k:'${r.k || ''}',v:this.value,u:'${r.u || ''}'})"></td>
-            <td><input type="text" value="${r.u || ''}" oninput="${onChange.name}(${i}, {k:'${r.k || ''}',v:'${r.v || ''}',u:this.value})"></td>
-            <td><button class="row-del" onclick="model.comp1.geometry.features[${id.split('-')[1]}].params.splice(${i},1); showContent('geometry');">🗑</button></td>
-        </tr>
-    `).join('') || `<tr><td colspan="4" class="small">行がありません。「＋行追加」で追加。</td></tr>`;
-    return `
-    <div class="table-wrap">
-        <div class="table-head"><div class="table-title">Key / Value / Unit</div>
-            <div class="table-actions"><button onclick="${onAdd.name}()">＋行追加</button></div></div>
-        <table class="table"><thead><tr><th>Key</th><th>Value</th><th>Unit</th><th></th></tr></thead>
-            <tbody>${body}</tbody></table>
-    </div>`;
-}
-
-
-/* ====== Materials ====== */
 function renderMaterials(main){
   let html = panel('Materials（comp1/materials）');
   html += `<div class="table-actions" style="margin-bottom:8px">${addBtn('＋材料ブロック追加',"addMaterial()")}</div>`;
   model.comp1.materials.forEach((m,idx)=>{
-    html += `<div class="panel">
-      <div class="panel-hd"><div class="panel-title">${m.name} <span class="badge">(${m.tag})</span></div>
+    html += `<div class="panel">      <div class="panel-hd"><div class="panel-title">${m.name} <span class="badge">(${m.tag})</span></div>
         <div style="margin-left:auto">${activeToggleHTML(m)}</div>
       </div>
       <div class="panel-bd">
-        <div class="kv"><label>表示名</label><input value="${m.name}" oninput="model.comp1.materials[${idx}].name=this.value"></div>
+        <div class="kv"><label>表示名</label><input value="${m.name}" oninput="model.comp1.materials[${idx}].name=this.value;autoSave()"></div>
         <div class="kv"><label>Selection（ドメインID）</label><div>${chipsHTML(m.selection, v=>{m.selection=v;})}</div></div>
         <div class="section-title">カスタム物性</div>
         ${tableGeneric(`mat-${idx}`, ['物性名','値/式','単位','備考'],
           (m.props||[]).map(p=>[p.prop,p.val,p.unit,p.note||'']),
-          (r,c,val)=>{ const p=m.props[r]; if(!p) return; ['prop','val','unit','note'][c]=val; },
-          ()=>{ (m.props||=[]).push({prop:'',val:'',unit:'',note:''}); showContent('materials'); },
-          r=>{ m.props.splice(r,1); showContent('materials'); })}
-        <div class="small"><button class="row-del" onclick="model.comp1.materials.splice(${idx},1);showContent('materials')">🗑 ブロック削除</button></div>
+          (r,c,val)=>{ const p=m.props[r]; if(!p) return; const keys=['prop','val','unit','note']; p[keys[c]]=val; autoSave(); },
+          ()=>{ (m.props||=[]).push({prop:'',val:'',unit:'',note:''}); showContent('materials'); autoSave(); },
+          r=>{ m.props.splice(r,1); showContent('materials'); autoSave(); })}
+        <div class="small"><button class="row-del" onclick="model.comp1.materials.splice(${idx},1);showContent('materials');autoSave()">🗑 ブロック削除</button></div>
       </div></div>`;
   });
   html += panelEnd();
@@ -573,31 +619,29 @@ function renderMaterials(main){
 function addMaterial(){
   model.comp1.materials.push({tag:newTag('mat'),name:`Material ${nextId.mat-1}`,active:true,selection:[],props:[]});
   showContent('materials');
+  autoSave();
 }
 
-/* ====== Physics ====== */
 function renderPhysics(main){
   let html = panel('Physics（comp1）');
-  html += `<div class="table-actions" style="margin-bottom:8px">
-    ${addBtn('＋Magnetic Fields (mfh)',"addPhysics('mfh','Magnetic Fields')")}
+  html += `<div class="table-actions" style="margin-bottom:8px">    ${addBtn('＋Magnetic Fields (mfh)',"addPhysics('mfh','Magnetic Fields')")}
     ${addBtn('＋Electric Currents (ec)',"addPhysics('ec','Electric Currents')")}
     ${addBtn('＋Heat Transfer (ht)',"addPhysics('ht','Heat Transfer')")}
   </div>`;
   model.comp1.physics.forEach((p,idx)=>{
-    html += `<div class="panel">
-      <div class="panel-hd"><div class="panel-title">${p.name} <span class="badge">(${p.tag})</span></div>
+    html += `<div class="panel">      <div class="panel-hd"><div class="panel-title">${p.name} <span class="badge">(${p.tag})</span></div>
         <div style="margin-left:auto">${activeToggleHTML(p)}</div>
       </div>
       <div class="panel-bd">
-        <div class="kv"><label>表示名</label><input value="${p.name}" oninput="model.comp1.physics[${idx}].name=this.value"></div>
+        <div class="kv"><label>表示名</label><input value="${p.name}" oninput="model.comp1.physics[${idx}].name=this.value;autoSave()"></div>
         <div class="kv"><label>Selection（領域/境界ID）</label><div>${chipsHTML(p.selection, v=>{p.selection=v;})}</div></div>
         <div class="section-title">パラメータ</div>
         ${tableGeneric(`phys-${idx}`, ['項目','値/式','単位','備考'],
           (p.params||[]).map(q=>[q.k,q.v,q.u||'',q.note||'']),
-          (r,c,val)=>{ const q=p.params[r]; if(q){['k','v','u','note'][c]=val;} },
-          ()=>{ (p.params||=[]).push({k:'',v:'',u:'',note:''}); showContent('physics'); },
-          r=>{ p.params.splice(r,1); showContent('physics'); })}
-        <div class="small"><button class="row-del" onclick="model.comp1.physics.splice(${idx},1);showContent('physics')">🗑 ブロック削除</button></div>
+          (r,c,val)=>{ const q=p.params[r]; const keys=['k','v','u','note']; q[keys[c]]=val; autoSave(); },
+          ()=>{ (p.params||[]).push({k:'',v:'',u:'',note:''}); showContent('physics'); autoSave(); },
+          r=>{ p.params.splice(r,1); showContent('physics'); autoSave(); })}
+        <div class="small"><button class="row-del" onclick="model.comp1.physics.splice(${idx},1);showContent('physics');autoSave()">🗑 ブロック削除</button></div>
       </div></div>`;
   });
   html += panelEnd();
@@ -607,32 +651,28 @@ function addPhysics(type, name){
   const tag = type + (nextId[type]++);
   model.comp1.physics.push({tag,name,type,active:true,selection:[],params:[]});
   showContent('physics');
+  autoSave();
 }
 
-/* ====== Mesh ====== */
 function renderMesh(main){
   let html = panel('Mesh（comp1/mesh1）');
-  html += `<div class="table-actions" style="margin-bottom:8px">
-    ${addBtn('＋Size', "addMesh('Size')")}
+  html += `<div class="table-actions" style="margin-bottom:8px">    ${addBtn('＋Size', "addMesh('Size')")}
     ${addBtn('＋Free Tetrahedral', "addMesh('Free Tetrahedral')")}
-    ${addBtn('＋Swept', "addMesh('Swept')")}
-    ${addBtn('＋Mapped', "addMesh('Mapped')")}
   </div>`;
   model.comp1.mesh.features.forEach((f,idx)=>{
-    html += `<div class="panel">
-      <div class="panel-hd"><div class="panel-title">${f.name} <span class="badge">(${f.tag})</span></div>
+    html += `<div class="panel">      <div class="panel-hd"><div class="panel-title">${f.name} <span class="badge">(${f.tag})</span></div>
         <div style="margin-left:auto">${activeToggleHTML(f)}</div>
       </div>
       <div class="panel-bd">
-        <div class="kv"><label>Type</label><input value="${f.type}" oninput="model.comp1.mesh.features[${idx}].type=this.value"></div>
+        <div class="kv"><label>Type</label><input value="${f.type}" oninput="model.comp1.mesh.features[${idx}].type=this.value;autoSave()"></div>
         <div class="kv"><label>Selection（ID）</label><div>${chipsHTML(f.selection, v=>{f.selection=v;})}</div></div>
         <div class="section-title">Parameters</div>
         ${tableGeneric(`mesh-${idx}`, ['項目','値/式','備考'],
           (f.params||[]).map(q=>[q.k,q.v,q.note||'']),
-          (r,c,val)=>{ const q=f.params[r]; if(q){['k','v','note'][c]=val;} },
-          ()=>{ (f.params||=[]).push({k:'',v:'',note:''}); showContent('mesh'); },
-          r=>{ f.params.splice(r,1); showContent('mesh'); })}
-        <div class="small"><button class="row-del" onclick="model.comp1.mesh.features.splice(${idx},1);showContent('mesh')">🗑 ブロック削除</button></div>
+          (r,c,val)=>{ const q=f.params[r]; const keys=['k','v','note']; q[keys[c]]=val; autoSave(); },
+          ()=>{ (f.params||[]).push({k:'',v:'',note:''}); showContent('mesh'); autoSave(); },
+          r=>{ f.params.splice(r,1); showContent('mesh'); autoSave(); })}
+        <div class="small"><button class="row-del" onclick="model.comp1.mesh.features.splice(${idx},1);showContent('mesh');autoSave()">🗑 ブロック削除</button></div>
       </div></div>`;
   });
   html += panelEnd();
@@ -641,35 +681,32 @@ function renderMesh(main){
 function addMesh(type){
   model.comp1.mesh.features.push({tag:newTag('mesh'),name:`${type} ${nextId.mesh-1}`,type,active:true,selection:[],params:[]});
   showContent('mesh');
+  autoSave();
 }
 
-/* ====== Study / Solver ====== */
 function renderStudy(main){
   let html = panel('Study 1（std1）', model.study.tag);
-  html += `<div class="section-title">Steps</div>
-    <div class="table-actions" style="margin-bottom:8px">
+  html += `<div class="section-title">Steps</div>    <div class="table-actions" style="margin-bottom:8px">
       ${addBtn('＋Stationary',"addStep('Stationary')")}
       ${addBtn('＋Time Dependent',"addStep('Time Dependent')")}
-      ${addBtn('＋Frequency Domain',"addStep('Frequency Domain')")}
       ${addBtn('＋Parametric Sweep',"addStep('Parametric Sweep')")}
     </div>`;
   model.study.steps.forEach((s,idx)=>{
-    html += `<div class="panel">
-      <div class="panel-hd"><div class="panel-title">Step ${idx+1}: ${s.name || s.type} <span class="badge">(${s.tag})</span></div>
+    html += `<div class="panel">      <div class="panel-hd"><div class="panel-title">Step ${idx+1}: ${s.type} <span class="badge">(${s.tag})</span></div>
         <div style="margin-left:auto">${activeToggleHTML(s)}</div>
       </div>
       <div class="panel-bd">
-        ${s.type==='Time Dependent'?`
-          <div class="kv"><label>時間設定 (tlist)</label><input value="${(s.tlist||'')}" oninput="model.study.steps[${idx}].tlist=this.value" placeholder="range(t0,dt,t1)"/></div>`:''}
-        ${s.type==='Frequency Domain'?`
-          <div class="kv"><label>周波数範囲</label><input value="${(s.frange||'')}" oninput="model.study.steps[${idx}].frange=this.value" placeholder="range(f0,df,f1)"/></div>`:''}
-        <div class="section-title">その他パラメータ</div>
+        ${s.type==='Time Dependent'?
+          `<div class="kv"><label>時間設定（tlist）</label><input value="${(s.tlist||'')}" oninput="model.study.steps[${idx}].tlist=this.value;autoSave()" placeholder="t0:dt:t1 / range()"/></div>`:''}
+        <div class="section-title">Step Parameters</div>
         ${tableGeneric(`step-${idx}`, ['項目','値','備考'],
           (s.params||[]).map(q=>[q.k,q.v,q.note||'']),
-          (r,c,val)=>{ const q=s.params[r]; if(q){['k','v','note'][c]=val;} },
-          ()=>{ (s.params||=[]).push({k:'',v:'',note:''}); showContent('study'); },
-          r=>{ s.params.splice(r,1); showContent('study'); })}
-        <div class="small"><button class="row-del" onclick="model.study.steps.splice(${idx},1);showContent('study')">🗑 Step削除</button></div>
+          (r,c,val)=>{ const q=s.params[r]; const keys=['k','v','note']; q[keys[c]]=val; autoSave(); },
+          ()=>{ (s.params||[]).push({k:'',v:'',note:''}); showContent('study'); autoSave(); },
+          r=>{ s.params.splice(r,1); showContent('study'); autoSave(); })}
+        <div class="section-title">Notes</div>
+        <textarea style="width:100%; min-height:60px; border:1px solid #d9e0ea; border-radius:6px; padding:8px;" oninput="model.study.steps[${idx}].notes=this.value;autoSave()">${s.notes||''}</textarea>
+        <div class="small"><button class="row-del" onclick="model.study.steps.splice(${idx},1);showContent('study');autoSave()">🗑 Step削除</button></div>
       </div></div>`;
   });
   html += panelEnd();
@@ -678,67 +715,61 @@ function renderStudy(main){
 function addStep(type){
   model.study.steps.push({tag:newTag('stp'),type,active:true,params:[],notes:''});
   showContent('study');
+  autoSave();
 }
 function renderSolver(main){
   let html = panel('Solver / Convergence');
-  html += tableGeneric('solver', ['タイプ','設定1','設定2','設定3','RelTol','AbsTol','MaxIt'],
-    model.study.solver.map(s=>[s.type,s.lin,s.nonlin,s.precond,s.rel,s.abs,s.maxit]),
-    (r,c,v)=>{ const keys=['type','lin','nonlin','precond','rel','abs','maxit']; model.study.solver[r][keys[c]]=v; },
-    ()=>{ model.study.solver.push({type:'',lin:'',nonlin:'',precond:'',rel:'',abs:'',maxit:''}); showContent('solver'); },
-    r=>{ model.study.solver.splice(r,1); showContent('solver'); }
+  html += tableGeneric('solver', ['タイプ','線形ソルバー','非線形','前処理','RelTol','AbsTol','MaxIt', '備考'],
+    model.study.solver.map(s=>[s.type,s.lin,s.nonlin,s.precond,s.rel,s.abs,s.maxit, s.note]),
+    (r,c,v)=>{ const keys=['type','lin','nonlin','precond','rel','abs','maxit','note']; model.study.solver[r][keys[c]]=v; autoSave(); },
+    ()=>{ model.study.solver.push({type:'',lin:'',nonlin:'',precond:'',rel:'',abs:'',maxit:'',note:''}); showContent('solver'); autoSave(); },
+    r=>{ model.study.solver.splice(r,1); showContent('solver'); autoSave(); }
   );
   html += panelEnd();
   main.innerHTML=html;
 }
 
-/* ====== Results ====== */
 function renderResults(main){
   let html = panel('Results：Datasets / Plot Groups');
 
-  // Datasets
-  html += `<div class="section-title">Datasets</div>
-    <div class="table-actions" style="margin-bottom:8px">${addBtn('＋Dataset追加',"addDataset()")}</div>`;
+  html += `<div class="section-title">Datasets</div>    <div class="table-actions" style="margin-bottom:8px">${addBtn('＋Dataset追加',"addDataset()")}</div>`;
   model.results.datasets.forEach((d,idx)=>{
-    html += `<div class="panel">
-      <div class="panel-hd"><div class="panel-title">${d.name} <span class="badge">(${d.tag})</span></div></div>
+    html += `<div class="panel">      <div class="panel-hd"><div class="panel-title">${d.name} <span class="badge">(${d.tag})</span></div></div>
       <div class="panel-bd">
-        <div class="kv"><label>Name</label><input value="${d.name}" oninput="model.results.datasets[${idx}].name=this.value"></div>
-        <div class="kv"><label>From Study</label><input value="${d.fromStudy||model.study.tag}" oninput="model.results.datasets[${idx}].fromStudy=this.value"></div>
-        <div class="kv"><label>Note</label><input value="${d.note||''}" oninput="model.results.datasets[${idx}].note=this.value"></div>
-        <div class="small"><button class="row-del" onclick="model.results.datasets.splice(${idx},1);showContent('results')">🗑 Dataset削除</button></div>
+        <div class="kv"><label>Name</label><input value="${d.name}" oninput="model.results.datasets[${idx}].name=this.value;autoSave()"></div>
+        <div class="kv"><label>From Study</label><input value="${d.fromStudy||model.study.tag}" oninput="model.results.datasets[${idx}].fromStudy=this.value;autoSave()"></div>
+        <div class="kv"><label>Note</label><input value="${d.note||''}" oninput="model.results.datasets[${idx}].note=this.value;autoSave()"></div>
+        <div class="small"><button class="row-del" onclick="model.results.datasets.splice(${idx},1);showContent('results');autoSave()">🗑 Dataset削除</button></div>
       </div></div>`;
   });
 
-  // Plot Groups
-  html += `<div class="section-title">Plot Groups</div>
-    <div class="table-actions" style="margin-bottom:8px">${addBtn('＋Plot Group追加',"addPlotGroup()")}</div>`;
+  html += `<div class="section-title">Plot Groups</div>    <div class="table-actions" style="margin-bottom:8px">${addBtn('＋Plot Group追加',"addPlotGroup()")}</div>`;
   model.results.plotGroups.forEach((pg,idx)=>{
-    html += `<div class="panel">
-      <div class="panel-hd"><div class="panel-title">${pg.name} <span class="badge">(${pg.tag})</span></div></div>
+    html += `<div class="panel">      <div class="panel-hd"><div class="panel-title">${pg.name} <span class="badge">(${pg.tag})</span></div></div>
       <div class="panel-bd">
-        <div class="kv"><label>Name</label><input value="${pg.name}" oninput="model.results.plotGroups[${idx}].name=this.value"></div>
+        <div class="kv"><label>Name</label><input value="${pg.name}" oninput="model.results.plotGroups[${idx}].name=this.value;autoSave()"></div>
         <div class="kv"><label>Dataset</label>
-          <select onchange="model.results.plotGroups[${idx}].datasetTag=this.value">
+          <select onchange="model.results.plotGroups[${idx}].datasetTag=this.value;autoSave()">
             ${model.results.datasets.map(d=>`<option value="${d.tag}" ${pg.datasetTag===d.tag?'selected':''}>${d.name} (${d.tag})</option>`).join('')}
           </select>
         </div>
         <div class="section-title">Plots</div>
         <div class="table-actions" style="margin-bottom:8px">${addBtn('＋Plot追加',`addPlot(${idx})`)}</div>
-        ${(pg.plots||[]).map((pl,pi)=>`
-          <div class="panel" style="border:1px dashed #e4e9f2">
+        ${(pg.plots||[]).map((pl,pi)=>
+          `<div class="panel" style="border:1px dashed #e4e9f2">
             <div class="panel-hd"><div class="panel-title">${pl.type} <span class="badge">(${pl.tag})</span></div></div>
             <div class="panel-bd">
-              <div class="kv"><label>Type</label><input value="${pl.type}" oninput="model.results.plotGroups[${idx}].plots[${pi}].type=this.value" placeholder="Surface/Line/Arrow等"></div>
+              <div class="kv"><label>Type</label><input value="${pl.type}" oninput="model.results.plotGroups[${idx}].plots[${pi}].type=this.value;autoSave()" placeholder="Surface/Line/Arrow等"></div>
               <div class="kv"><label>Selection（ID）</label><div>${chipsHTML(pl.selection, v=>{pl.selection=v;})}</div></div>
-              <div class="kv"><label>Expression</label><input value="${pl.expr||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].expr=this.value"></div>
-              <div class="kv"><label>Unit</label><input value="${pl.unit||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].unit=this.value"></div>
-              <div class="kv"><label>Note</label><input value="${pl.note||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].note=this.value"></div>
-              <div class="small"><button class="row-del" onclick="model.results.plotGroups[${idx}].plots.splice(${pi},1);showContent('results')">🗑 Plot削除</button></div>
+              <div class="kv"><label>Expression</label><input value="${pl.expr||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].expr=this.value;autoSave()"></div>
+              <div class="kv"><label>Unit</label><input value="${pl.unit||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].unit=this.value;autoSave()"></div>
+              <div class="kv"><label>Note</label><input value="${pl.note||''}" oninput="model.results.plotGroups[${idx}].plots[${pi}].note=this.value;autoSave()"></div>
+              <div class="small"><button class="row-del" onclick="model.results.plotGroups[${idx}].plots.splice(${pi},1);showContent('results');autoSave()">🗑 Plot削除</button></div>
             </div>
-          </div>
-        `).join('')}
+          </div>`
+        ).join('')}
         <div class="hr"></div>
-        <div class="small"><button class="row-del" onclick="model.results.plotGroups.splice(${idx},1);showContent('results')">🗑 Plot Group削除</button></div>
+        <div class="small"><button class="row-del" onclick="model.results.plotGroups.splice(${idx},1);showContent('results');autoSave()">🗑 Plot Group削除</button></div>
       </div></div>`;
   });
 
@@ -748,31 +779,32 @@ function renderResults(main){
 function addDataset(){
   model.results.datasets.push({tag:newTag('dset'),name:`Solution ${nextId.dset-1}`,fromStudy:model.study.tag,note:''});
   showContent('results');
+  autoSave();
 }
 function addPlotGroup(){
   const d = model.results.datasets[0]?.tag;
   model.results.plotGroups.push({tag:newTag('pg'),name:`3D Plot Group ${nextId.pg-1}`,datasetTag:d,plots:[]});
   showContent('results');
+  autoSave();
 }
 function addPlot(pgIndex){
   model.results.plotGroups[pgIndex].plots.push({tag:newTag('plt'),type:'Surface',selection:[],expr:'',unit:'',note:''});
   showContent('results');
+  autoSave();
 }
 
-/* ====== Derived Values ====== */
 function renderDerived(main){
   let html = panel('Derived Values');
   html += `<div class="table-actions" style="margin-bottom:8px">${addBtn('＋Derived追加',"addDerived()")}</div>`;
   model.results.derived.forEach((d,idx)=>{
-    html += `<div class="panel">
-      <div class="panel-hd"><div class="panel-title">${d.name} <span class="badge">(${d.tag})</span></div></div>
+    html += `<div class="panel">      <div class="panel-hd"><div class="panel-title">${d.name} <span class="badge">(${d.tag})</span></div></div>
       <div class="panel-bd">
-        <div class="kv"><label>Name</label><input value="${d.name}" oninput="model.results.derived[${idx}].name=this.value"></div>
-        <div class="kv"><label>Type</label><input value="${d.type}" oninput="model.results.derived[${idx}].type=this.value" placeholder="Point/Line/Surface Average 等"></div>
+        <div class="kv"><label>Name</label><input value="${d.name}" oninput="model.results.derived[${idx}].name=this.value;autoSave()"></div>
+        <div class="kv"><label>Type</label><input value="${d.type}" oninput="model.results.derived[${idx}].type=this.value;autoSave()" placeholder="Point/Line/Surface Average 等"></div>
         <div class="kv"><label>Selection（ID）</label><div>${chipsHTML(d.selection, v=>{d.selection=v;})}</div></div>
-        <div class="kv"><label>Expression</label><input value="${d.expr||''}" oninput="model.results.derived[${idx}].expr=this.value"></div>
-        <div class="kv"><label>Note</label><input value="${d.note||''}" oninput="model.results.derived[${idx}].note=this.value"></div>
-        <div class="small"><button class="row-del" onclick="model.results.derived.splice(${idx},1);showContent('derived')">🗑 Derived削除</button></div>
+        <div class="kv"><label>Expression</label><input value="${d.expr||''}" oninput="model.results.derived[${idx}].expr=this.value;autoSave()"></div>
+        <div class="kv"><label>Note</label><input value="${d.note||''}" oninput="model.results.derived[${idx}].note=this.value;autoSave()"></div>
+        <div class="small"><button class="row-del" onclick="model.results.derived.splice(${idx},1);showContent('derived');autoSave()">🗑 Derived削除</button></div>
       </div></div>`;
   });
   html += panelEnd();
@@ -781,23 +813,20 @@ function renderDerived(main){
 function addDerived(){
   model.results.derived.push({tag:newTag('plt'),name:`Derived ${nextId.plt-1}`,type:'Line Average',selection:[],expr:'',note:''});
   showContent('derived');
+  autoSave();
 }
 
-/* ====== 汎用テーブル（行追加/削除） ====== */
 function tableGeneric(id, headers, rows, onCell, onAdd, onDel){
   const head = headers.map(h=>`<th>${h}</th>`).join('') + '<th></th>';
-  const body = rows.length? rows.map((r,ri)=>`
-    <tr>
-    ${r.map((v,ci)=>`<td><input type="text" value="${v??''}" oninput="${onCell.name}(${ri},${ci},this.value)"></td>`).join('')}
-    <td><button class="row-del" onclick="${onDel.name}(${ri})">🗑</button></td></tr>`).join('')
+  const body = rows.length? rows.map((r,ri)=>
+    `<tr>
+    ${r.map((v,ci)=>`<td><input type="text" value="${v??''}" oninput="(${onCell})(${ri},${ci},this.value)"></td>`).join('')}
+    <td><button class="row-del" onclick="(${onDel})(${ri})">🗑</button></td></tr>`).join('')
     : `<tr><td colspan="${headers.length+1}" class="small">行がありません。「＋行追加」で追加。</td></tr>`;
-  return `<div class="table-wrap">
-    <div class="table-head"><div class="table-title">${id.split('-')[0]}</div>
-      <div class="table-actions"><button onclick="${onAdd.name}()">＋行追加</button></div></div>
-    <table class="table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
-}
+  return `<div class="table-wrap">    <div class="table-head"><div class="table-title">${id}</div>
+      <div class="table-actions"><button onclick="(${onAdd})()">＋行追加</button></div></div>
+    <table class="table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;}
 
-/* init */
 updateStats();
 </script>
 </body>
