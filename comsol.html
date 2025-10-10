@@ -86,12 +86,13 @@ input:checked + .slider:before{transform:translateX(16px)}
 @keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
 
 @media print{
-  .sidebar,.header-actions,.progress-bar,.table-actions button,.row-del{display:none!important}
+  .sidebar,.header-actions,.progress-bar,.table-actions button,.row-del, .view-placeholder{display:none!important}
   .container{display:block;height:auto}
   .main-content{padding:0;display:block}
-  .details{max-width:100%;min-width:100%}
+  .details{max-width:100%;min-width:100%;overflow:visible}
   .panel{page-break-inside:avoid;box-shadow:none;border:1px solid #ccc}
   body{background:#fff}
+  h1{font-size:18px; color:#1f4e79; padding-top:24px; border-bottom:2px solid #1f4e79; margin-bottom:16px;}
 }
 </style>
 </head>
@@ -104,6 +105,7 @@ input:checked + .slider:before{transform:translateX(16px)}
         <button class="header-btn" onclick="exportJSON()" title="JSONでエクスポート">💾</button>
         <button class="header-btn" onclick="importJSON()" title="JSONをインポート">📂</button>
         <button class="header-btn" onclick="exportPDF()" title="PDFで出力">📄</button>
+        <button class="header-btn" onclick="exportAllAsPDF()" title="全項目をPDFで出力">📄 All</button>
       </div>
     </div>
     <div class="modelroot">モデル（Model 1）</div>
@@ -296,8 +298,6 @@ function seed(){
   );
 
   // --- Global Definitions: Functions ---
-  // The app's table format doesn't support piecewise functions well,
-  // so we describe them in a readable format in the expression field.
   model.global.functions.push(
     {tag:newTag('fn'), fname:'int2', args:'t', expr:'(t=0 -> -Bs), (t<=mag_time -> Bs), (t>mag_time -> Bs)', unit:'', type:'Piecewise'},
     {tag:newTag('fn'), fname:'int3', args:'t', expr:'(t=0 -> (min+max)/2), (t<=1000 -> max), (t<=2000 -> (min+max)/2), (t<=3000 -> min), (t<=4000 -> (min+max)/2), (t<=5000 -> max)', unit:'', type:'Piecewise'}
@@ -311,7 +311,6 @@ function seed(){
   );
   
   // --- Components: Physics ---
-  // Using params table to describe the regions as selection IDs are not specified.
   model.comp1.physics.push(
     {tag:newTag('mfh'), name:'AIR', type:'mfh', active:true, selection:[], params:[{k:'適用領域', v:'表面'}]},
     {tag:newTag('mfh'), name:'M_insu', type:'mfh', active:true, selection:[], params:[{k:'適用領域', v:'断面部分'}]},
@@ -441,7 +440,6 @@ function exportPDF(){
   showToast('PDF生成中...');
   setTimeout(()=>{
     window.print();
-    showToast('印刷ダイアログを開きました');
   }, 100);
 }
 
@@ -559,7 +557,6 @@ function modelPath(id){
   return [];
 }
 
-// Special render function for Geometry to show user's custom table
 function renderGeometry(main){
   let html = panel('Geometry（comp1/geom1）');
   html += `<div class="section-title">形状パターン</div>`;
@@ -826,6 +823,55 @@ function tableGeneric(id, headers, rows, onCell, onAdd, onDel){
   return `<div class="table-wrap">    <div class="table-head"><div class="table-title">${id}</div>
       <div class="table-actions"><button onclick="(${onAdd})()">＋行追加</button></div></div>
     <table class="table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;}
+
+
+// ▼▼▼ 追加した関数 ▼▼▼
+function exportAllAsPDF() {
+  const main = document.getElementById('main');
+  const originalContent = main.innerHTML;
+  const originalTitle = document.title;
+
+  showToast('全ページのPDFを生成中...');
+
+  let allContent = '';
+  
+  allContent += '<h1>グローバル定義 (Global Definitions)</h1>';
+  allContent += renderSectionHTML(renderParameters);
+  allContent += renderSectionHTML(renderVariables);
+  allContent += renderSectionHTML(renderFunctions);
+
+  allContent += '<h1>コンポーネント 1 (comp1)</h1>';
+  allContent += renderSectionHTML(renderGeometry);
+  allContent += renderSectionHTML(renderMaterials);
+  allContent += renderSectionHTML(renderPhysics);
+  allContent += renderSectionHTML(renderMesh);
+
+  allContent += '<h1>スタディ (Study)</h1>';
+  allContent += renderSectionHTML(renderStudy);
+  allContent += renderSectionHTML(renderSolver);
+  
+  allContent += '<h1>結果 (Results)</h1>';
+  allContent += renderSectionHTML(renderResults);
+  allContent += renderSectionHTML(renderDerived);
+
+  main.innerHTML = allContent;
+  document.title = `COMSOL_Settings_Export_${new Date().toISOString().slice(0,10)}`;
+
+  setTimeout(() => {
+    window.print();
+    
+    main.innerHTML = originalContent;
+    document.title = originalTitle;
+  }, 500);
+}
+
+function renderSectionHTML(renderFunc) {
+  const tempDiv = document.createElement('div');
+  renderFunc(tempDiv);
+  return tempDiv.innerHTML;
+}
+// ▲▲▲ 追加した関数ここまで ▲▲▲
+
 
 updateStats();
 </script>
