@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>COMSOL設定管理（COMSOL風フル版）</title>
+<title>COMSOL設定管理（COMSOL風フル版 / プロジェクト既定値込み）</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;background:#f3f6fb;color:#333}
@@ -34,6 +34,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Hiragino Ka
 .panel-title{font-weight:800;color:#2c5aa0}
 .panel-bd{padding:14px 16px}
 .badge{display:inline-block;padding:2px 7px;border-radius:12px;background:#eef5ff;color:#2c5aa0;font-size:11px;margin-left:6px}
+.badge-warn{background:#fff1d6;color:#ad5a00}
 .kv{display:grid;grid-template-columns:180px 1fr;gap:10px;margin:6px 0}
 .kv label{font-size:12px;color:#667}
 .kv input,.kv select{border:1px solid #d9e0ea;border-radius:6px;padding:8px;font-size:13px}
@@ -84,6 +85,9 @@ input:checked + .slider:before{transform:translateX(16px)}
 .toast{position:fixed;top:20px;right:20px;background:#2c5aa0;color:#fff;padding:12px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:3000;display:none;animation:slideIn .3s ease}
 .toast.show{display:block}
 @keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+.imp-row td{background:#fff7e6}
+.imp-badge{display:inline-block;margin-left:8px;padding:1px 6px;border-radius:10px;background:#ffebc2;color:#8a4b00;font-size:11px;border:1px solid #f3c98b}
 
 @media print{
   .sidebar,.header-actions,.progress-bar,.table-actions button,.row-del{display:none!important}
@@ -161,11 +165,12 @@ input:checked + .slider:before{transform:translateX(16px)}
     <div class="view-placeholder">（ビュー領域 / 参考：COMSOLのグラフィックス）</div>
     <div class="details" id="main">
       <div class="panel">
-        <div class="panel-hd"><div class="panel-title">COMSOL設定管理（COMSOL風）</div></div>
+        <div class="panel-hd"><div class="panel-title">COMSOL設定管理（COMSOL風 / 既定値込み）</div></div>
         <div class="panel-bd small">
           左のツリーからノードを選択すると、右側に「Settings」風の編集UIが表示されます。<br>
           <b>データ保存：</b>ヘッダーの💾ボタンでJSONファイルをダウンロード、📂ボタンで読み込み、📄ボタンでPDF出力できます。<br>
-          <b>自動保存：</b>ブラウザに自動的に保存されます（同じブラウザで開けば復元されます）。
+          <b>自動保存：</b>ブラウザに自動的に保存されます（同じブラウザで開けば復元されます）。<br>
+          <b>＊強調：</b>「＊」が付いた重要・統一項目は行をハイライトしています。
         </div>
       </div>
     </div>
@@ -249,7 +254,11 @@ const model = {
     functions:[]
   },
   comp1:{
-    geometry:{ features:[] },
+    geometry:{
+      features:[],
+      patterns:[],      // 追加：形状パターン表
+      notes:''          // 追加：形状変更ルール
+    },
     materials:[],
     physics:[],
     mesh:{ features:[] }
@@ -258,7 +267,7 @@ const model = {
     tag:'std1', name:'Study 1',
     steps:[],
     solver:[
-      {type:'Linear/Nonlinear', lin:'', nonlin:'', precond:'', rel:'', abs:'', maxit:''}
+      {type:'Time Dependent', lin:'Direct', nonlin:'Fully coupled', precond:'', rel:'', abs:'', maxit:'', notes:'時間ステッピングの非線形コントローラーを有効 / 強連成を直接解法で'}
     ]
   },
   results:{
@@ -268,31 +277,132 @@ const model = {
   }
 };
 
+// === 既定値の投入 ===
 function seed(){
-  model.global.parameters.push({tag:newTag('param'),name:'L',expr:'10',unit:'mm',desc:'長さ'});
-  model.global.variables.push({tag:newTag('var'),name:'area',expr:'L^2',unit:'mm^2',note:''});
-  model.global.functions.push({tag:newTag('fn'),fname:'f1',args:'x',expr:'sin(x)',unit:'',type:'Analytic'});
-  model.comp1.geometry.features.push({tag:newTag('blk'),type:'Block',name:'Block 1',params:[
-    {k:'Lx',v:'L',u:'mm'}, {k:'Ly',v:'L',u:'mm'}, {k:'H',v:'L',u:'mm'}
-  ]});
-  model.comp1.materials.push({tag:newTag('mat'),name:'Material 1 – AIR',active:true,selection:[1],props:[
-    {prop:'rho',val:'1.2',unit:'kg/m^3'}
-  ]});
-  model.comp1.physics.push({tag:'mfh'+(nextId.mfh++),name:'Magnetic Fields',type:'mfh',active:true,selection:[11,12],params:[]});
-  model.comp1.mesh.features.push({tag:newTag('mesh'),name:'Size',type:'Size',active:true,selection:[],params:[
-    {k:'最大要素',v:'L/5'},{k:'最小要素',v:'L/50'}
-  ]});
-  model.study.steps.push({tag:newTag('stp'),type:'Stationary',active:true,params:[],notes:''});
-  model.study.steps.push({tag:newTag('stp'),type:'Parametric Sweep',active:true,params:[
-    {k:'Parameter',v:'L'}, {k:'Range',v:'range(5[mm],1[mm],15[mm])'}
-  ],notes:''});
+  // Parameters（＊は imp:true で強調）
+  model.global.parameters.push(
+    {tag:newTag('param'),name:'gap',expr:'4',unit:'mm',desc:'バルク間距離'},
+    {tag:newTag('param'),name:'radius_bulk',expr:'15',unit:'mm',desc:'バルク直径'},
+    {tag:newTag('param'),name:'thickness_bulk',expr:'5',unit:'mm',desc:'バルク厚み'},
+    {tag:newTag('param'),name:'lambda',expr:'10',unit:'mm',desc:'周期長'},
+    {tag:newTag('param'),name:'magnetization_time',expr:'1000',unit:'s',desc:'磁化時間'},
+    {tag:newTag('param'),name:'relaxation_time',expr:'1000',unit:'s',desc:'緩和時間'},
+    {tag:newTag('param'),name:'Dy2',expr:'1',unit:'mm',desc:'リング直線部のy方向長さ',imp:true},
+    {tag:newTag('param'),name:'Dz2',expr:'lambda-thickness_bulk-g_C*4',unit:'mm',desc:'リング直線部のz方向長さ'},
+    {tag:newTag('param'),name:'J_c_param',expr:'10',unit:'[kA/mm^2]',desc:'臨界電流密度',imp:true},
+    {tag:newTag('param'),name:'Bs_time',expr:'5000',unit:'s',desc:'ヒステリシス解析時の時間'},
+    {tag:newTag('param'),name:'Bs',expr:'5',unit:'T',desc:'外部磁場',imp:true},
+    {tag:newTag('param'),name:'Bs_min',expr:'-5',unit:'T',desc:'ヒステリシス解析時の最小磁場'},
+    {tag:newTag('param'),name:'Bs_max',expr:'5',unit:'T',desc:'ヒステリシス解析時の最大磁場'},
+    // 依存定数（変数で使用）
+    {tag:newTag('param'),name:'mu0_const',expr:'4*pi*1e-7',unit:'[H/m]',desc:'真空の透磁率（定数）'}
+  );
+
+  // Variables
+  model.global.variables.push(
+    {tag:newTag('var'),name:'VECT_normJ',expr:'sqrt((mfh.Jx+eps)^2+(mfh.Jy+eps)^2+(mfh.Jz+eps)^2)',unit:'[A/m^2]',note:''},
+    {tag:newTag('var'),name:'n',expr:'21',unit:'',note:'収束するように統一',imp:true},
+    {tag:newTag('var'),name:'E_c',expr:'0.0001',unit:'[V/m]',note:''},
+    // E-J パワー則に基づく抵抗率（VECT_normJ を利用）
+    {tag:newTag('var'),name:'rho_SC',expr:'E_c*(1/VECT_normJ)*abs((VECT_normJ/J_c)^n)',unit:'',note:'超伝導相の見かけ抵抗率'},
+    {tag:newTag('var'),name:'rho_AIR',expr:'1',unit:'[Ω*m]',note:''},
+    {tag:newTag('var'),name:'H_ext',expr:'int2(t)/mu0_const',unit:'',note:'条件で関数名変更可（int2 or int3 等）',imp:true},
+    {tag:newTag('var'),name:'J_c',expr:'J_c_param',unit:'',note:''}
+  );
+
+  // Functions（Analytic + Piecewise に対応）
+  model.global.functions.push(
+    // int2: 0→-Bs, t=magnetization_time で Bs, 以後 Bs を保持
+    {tag:newTag('fn'),fname:'int2',args:'t',type:'Piecewise',unit:'',pieces:[
+      {x:'0', y:'-Bs'},
+      {x:'magnetization_time', y:'Bs'},
+      {x:'magnetization_time+relaxation_time', y:'Bs'}
+    ]},
+    // int3: ヒステリシス往復パターン
+    {tag:newTag('fn'),fname:'int3',args:'t',type:'Piecewise',unit:'',pieces:[
+      {x:'0',    y:'(Bs_min+Bs_max)/2'},
+      {x:'1000', y:'Bs_max'},
+      {x:'2000', y:'(Bs_min+Bs_max)/2'},
+      {x:'3000', y:'Bs_min'},
+      {x:'4000', y:'(Bs_min+Bs_max)/2'},
+      {x:'5000', y:'Bs_max'}
+    ]}
+  );
+
+  // Geometry：基本形状は省略し、パターン表と変更ルールを格納
+  model.comp1.geometry.patterns.push(
+    {tag:newTag('blk'), name:'形状パターン 1', cols:['リング数=2','周期=1','カット=×','解析=Jc,Dy2,Bs']},
+    {tag:newTag('blk'), name:'形状パターン 2', cols:['リング数=2','周期=1','カット=○','解析=—']},
+    {tag:newTag('blk'), name:'形状パターン 3', cols:['リング数=2','周期=0.5','カット=×','解析=—']},
+    {tag:newTag('blk'), name:'形状パターン 4', cols:['リング数=2','周期=0.5','カット=○','解析=—']},
+    {tag:newTag('blk'), name:'形状パターン 5', cols:['リング数=1','周期=1','カット=×','解析=—']},
+    {tag:newTag('blk'), name:'形状パターン 6', cols:['リング数=1','周期=1','カット=○','解析=—']}
+  );
+  model.comp1.geometry.notes =
+    '【カット=○】ポリゴン2種の「3.7点」の y 座標を変更。\\n' +
+    '【周期=0.5】線分長 = lambda/2, ポイント数=1, 座標: (0,0,0)。\\n' +
+    '【周期=1】  線分長 = lambda, ポイント数=2, 座標: (0,0,lambda/4), (0,0,-lambda/4)。\\n' +
+    '※ 解析パターンは1行目の指定（Jc, Dy2, Bs）と同一ルールを適用。';
+
+  // Materials（選択番号は未指定のためノートで明示）
+  model.comp1.materials.push(
+    {tag:newTag('mat'),name:'AIR',active:true,selection:[],props:[{prop:'rho',val:'1.2',unit:'kg/m^3'}], note:'ドメイン：全部'},
+    {tag:newTag('mat'),name:'SC1',active:true,selection:[],props:[], note:'ドメイン：バルク'},
+    {tag:newTag('mat'),name:'SC2',active:true,selection:[],props:[], note:'ドメイン：リング'}
+  );
+
+  // Physics（領域はノートで明示）
+  model.comp1.physics.push(
+    {tag:'mfh'+(nextId.mfh++),name:'AIR',type:'mfh',active:true,selection:[],params:[], note:'表面'},
+    {tag:'ec'+(nextId.ec++),name:'M_insu',type:'ec',active:true,selection:[],params:[], note:'断面部分'},
+    {tag:'ht'+(nextId.ht++),name:'initial',type:'ht',active:true,selection:[],params:[], note:'全部'},
+    {tag:'mfh'+(nextId.mfh++),name:'SC',type:'mfh',active:true,selection:[],params:[], note:'バルク, リング'},
+    {tag:'mfh'+(nextId.mfh++),name:'M_field',type:'mfh',active:true,selection:[],params:[], note:'断面でない部分'}
+  );
+
+  // Mesh（名称に合わせて Size / Mapped / Swept を設定）
+  model.comp1.mesh.features.push(
+    {tag:newTag('mesh'),name:'Beam – Mapped',type:'Mapped',active:true,selection:[],params:[
+      {k:'横分割',v:'1',note:''},{k:'縦分割',v:'2',note:''}
+    ]},
+    {tag:newTag('mesh'),name:'Beam – Swept',type:'Swept',active:true,selection:[],params:[
+      {k:'層数',v:'50',note:''}
+    ]},
+    {tag:newTag('mesh'),name:'Bulk – Size',type:'Size',active:true,selection:[],params:[
+      {k:'要素サイズ',v:'0.001[m]',note:'SC'}
+    ]},
+    {tag:newTag('mesh'),name:'Ring – Size',type:'Size',active:true,selection:[],params:[
+      {k:'要素サイズ',v:'0.001[m]',note:'SC1'}
+    ]},
+    {tag:newTag('mesh'),name:'Air – Size',type:'Size',active:true,selection:[],params:[
+      {k:'要素設定',v:'残りの領域',note:'AIR'}
+    ]}
+  );
+
+  // Study（Jc, Dy2 は Parametric Sweep + Time Dependent、Bs は Time Dependent）
+  // Jc
+  model.study.steps.push(
+    {tag:newTag('stp'),type:'Parametric Sweep',active:true,param:'J_c_param',range:'（8パターン）',params:[{k:'備考',v:'Jc 8パターン'}]},
+    {tag:newTag('stp'),type:'Time Dependent',active:true,tlist:'range(0,(magnetization_time+relaxation_time)/100,magnetization_time+relaxation_time)',params:[]}
+  );
+  // Dy2
+  model.study.steps.push(
+    {tag:newTag('stp'),type:'Parametric Sweep',active:true,param:'Dy2',range:'（9パターン, 単位=mm）',params:[{k:'備考',v:'Dy2 9パターン（mm）'}]},
+    {tag:newTag('stp'),type:'Time Dependent',active:true,tlist:'range(0,(magnetization_time+relaxation_time)/100,magnetization_time+relaxation_time)',params:[]}
+  );
+  // Bs（タイム）
+  model.study.steps.push(
+    {tag:newTag('stp'),type:'Time Dependent',active:true,tlist:'range(0,Bs_time/50,Bs_time)',params:[{k:'備考',v:'Bs 5パターン想定（関数切替）'}]}
+  );
+
+  // Dataset / Plot（プレースホルダ）
   const d1 = {tag:newTag('dset'),name:'Solution 1',fromStudy:model.study.tag,note:''};
   model.results.datasets.push(d1);
   const pg1 = {tag:newTag('pg'),name:'3D Plot Group 1',datasetTag:d1.tag,plots:[
     {tag:newTag('plt'),type:'Surface',selection:[],expr:'mf.normB',unit:'T',note:''}
   ]};
   model.results.plotGroups.push(pg1);
-  model.results.derived.push({tag:newTag('plt'),name:'Line Average 1',type:'Line Average',selection:[21,22],expr:'mf.Bz',note:''});
+  model.results.derived.push({tag:newTag('plt'),name:'Line Average 1',type:'Line Average',selection:[],expr:'mf.Bz',note:''});
 }
 
 // 自動保存・復元
@@ -304,7 +414,6 @@ function autoSave(){
     console.warn('Auto-save failed:', e);
   }
 }
-
 function autoLoad(){
   try{
     const data = localStorage.getItem('comsol_model');
@@ -321,7 +430,7 @@ function autoLoad(){
   return false;
 }
 
-// JSONエクスポート
+// JSONエクスポート/インポート/PDF
 function exportJSON(){
   const data = JSON.stringify({model, nextId}, null, 2);
   const blob = new Blob([data], {type:'application/json'});
@@ -333,22 +442,11 @@ function exportJSON(){
   URL.revokeObjectURL(url);
   showToast('JSONファイルをダウンロードしました');
 }
-
-// JSONインポート
-function importJSON(){
-  document.getElementById('import-modal').classList.add('show');
-}
-
-function closeModal(){
-  document.getElementById('import-modal').classList.remove('show');
-}
-
+function importJSON(){ document.getElementById('import-modal').classList.add('show'); }
+function closeModal(){ document.getElementById('import-modal').classList.remove('show'); }
 function loadJSONFile(){
   const file = document.getElementById('file-input').files[0];
-  if(!file){
-    alert('ファイルを選択してください');
-    return;
-  }
+  if(!file){ alert('ファイルを選択してください'); return; }
   const reader = new FileReader();
   reader.onload = e=>{
     try{
@@ -365,16 +463,10 @@ function loadJSONFile(){
   };
   reader.readAsText(file);
 }
-
-// PDF出力
 function exportPDF(){
   showToast('PDF生成中...');
-  setTimeout(()=>{
-    window.print();
-    showToast('印刷ダイアログを開きました');
-  }, 100);
+  setTimeout(()=>{ window.print(); showToast('印刷ダイアログを開きました'); }, 100);
 }
-
 function showToast(msg){
   const toast = document.getElementById('toast');
   toast.textContent = msg;
@@ -412,13 +504,14 @@ function showContent(id){
   if(id==='derived')    return renderDerived(main);
 }
 
+// 共通UI
 function panel(title,tag){ return `
   <div class="panel"><div class="panel-hd">
     <div class="panel-title">${title}${tag?` <span class="badge">(${tag})</span>`:''}</div>
   </div><div class="panel-bd">`; }
 function panelEnd(){ return `</div></div>`; }
 function addBtn(label,onclick){ return `<button onclick="${onclick}">${label}</button>`; }
-function activeToggleHTML(obj, path){
+function activeToggleHTML(obj){
   const id='sw-'+Math.random().toString(36).slice(2);
   setTimeout(()=>{
     const el=document.getElementById(id);
@@ -434,50 +527,99 @@ function unitSplit(expr){
   return m? {v:m[1],u:m[2]} : {v:expr,u:''};
 }
 
+// Parameters
 function renderParameters(main){
-  initChecks('parameters',[{},{},{}]);
   let html = panel('Parameters（パラメータ）');
   html += tableSimple('parameters','param',
     [{key:'name',label:'Name'},{key:'expr',label:'Expression'},{key:'unit',label:'Unit'},{key:'desc',label:'Description'}],
     model.global.parameters,
     (row,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); row.expr=p.v; if(!row.unit) row.unit=p.u; } row[k]=v; autoSave(); },
-    ()=>{ model.global.parameters.push({tag:newTag('param'),name:'',expr:'',unit:'',desc:''}); autoSave(); }
+    ()=>{ model.global.parameters.push({tag:newTag('param'),name:'',expr:'',unit:'',desc:''}); autoSave(); },
+    row=>row.imp
   );
+  html += `<div class="small">＊＝重要・要統一 <span class="imp-badge">＊</span> 行でハイライト</div>`;
   html += panelEnd();
   main.innerHTML = html;
 }
+
+// Variables
 function renderVariables(main){
-  initChecks('variables',[{}]);
   let html = panel('Variables（変数）');
   html += tableSimple('variables','var',
     [{key:'name',label:'Name'},{key:'expr',label:'Expression'},{key:'unit',label:'Unit'},{key:'note',label:'Note'}],
     model.global.variables,
     (r,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); r.expr=p.v; if(!r.unit) r.unit=p.u; } r[k]=v; autoSave(); },
-    ()=>{ model.global.variables.push({tag:newTag('var'),name:'',expr:'',unit:'',note:''}); autoSave(); }
+    ()=>{ model.global.variables.push({tag:newTag('var'),name:'',expr:'',unit:'',note:''}); autoSave(); },
+    row=>row.imp
   );
+  html += `<div class="small">＊＝重要・要統一 <span class="imp-badge">＊</span> 行でハイライト</div>`;
   html += panelEnd();
   main.innerHTML = html;
 }
+
+// Functions（Analytic / Piecewise）
 function renderFunctions(main){
-  initChecks('functions',[{}]);
   let html = panel('Functions（関数）');
-  html += tableSimple('functions','fn',
-    [{key:'fname',label:'Name'},{key:'args',label:'Arguments'},{key:'expr',label:'Expression'},{key:'unit',label:'Unit'},{key:'type',label:'Type'}],
-    model.global.functions,
-    (r,k,v)=>{ if(k==='expr'){ const p=unitSplit(v); r.expr=p.v; if(!r.unit) r.unit=p.u; } r[k]=v; autoSave(); },
-    ()=>{ model.global.functions.push({tag:newTag('fn'),fname:'',args:'',expr:'',unit:'',type:'Analytic'}); autoSave(); }
-  );
+  html += `<div class="table-actions" style="margin-bottom:8px">${addBtn('＋Analytic関数追加',"addFunction('Analytic')")} ${addBtn('＋Piecewise関数追加',"addFunction('Piecewise')")}</div>`;
+  model.global.functions.forEach((f,idx)=>{
+    html += `<div class="panel" style="border:1px solid #eaeef6">
+      <div class="panel-hd"><div class="panel-title">${f.fname||'Function'} <span class="badge">(${f.tag})</span></div></div>
+      <div class="panel-bd">
+        <div class="kv"><label>Name</label><input value="${f.fname||''}" oninput="model.global.functions[${idx}].fname=this.value;autoSave()"></div>
+        <div class="kv"><label>Arguments</label><input value="${f.args||''}" oninput="model.global.functions[${idx}].args=this.value;autoSave()"></div>
+        <div class="kv"><label>Type</label>
+          <select onchange="model.global.functions[${idx}].type=this.value;showContent('functions');autoSave()">
+            <option ${f.type==='Analytic'?'selected':''}>Analytic</option>
+            <option ${f.type==='Piecewise'?'selected':''}>Piecewise</option>
+          </select>
+        </div>
+        ${f.type==='Analytic'
+          ? `<div class="kv"><label>Expression</label><input value="${f.expr||''}" oninput="model.global.functions[${idx}].expr=this.value;autoSave()"></div>`
+          : renderPieceTable(idx, f)}
+        <div class="kv"><label>Unit</label><input value="${f.unit||''}" oninput="model.global.functions[${idx}].unit=this.value;autoSave()"></div>
+        <div class="small"><button class="row-del" onclick="model.global.functions.splice(${idx},1);showContent('functions');autoSave()">🗑 関数削除</button></div>
+      </div></div>`;
+  });
   html += panelEnd();
   main.innerHTML = html;
 }
-function tableSimple(contentId, prefix, columns, rows, onChange, onAdd){
+function renderPieceTable(fi, f){
+  const rows = (f.pieces||[]).map((p,pi)=>`
+    <tr>
+      <td><input value="${p.x??''}" oninput="model.global.functions[${fi}].pieces[${pi}].x=this.value;autoSave()"></td>
+      <td><input value="${p.y??''}" oninput="model.global.functions[${fi}].pieces[${pi}].y=this.value;autoSave()"></td>
+      <td><button class="row-del" onclick="model.global.functions[${fi}].pieces.splice(${pi},1);showContent('functions');autoSave()">🗑</button></td>
+    </tr>
+  `).join('') || `<tr><td colspan="3" class="small">行がありません。「＋行追加」で追加。</td></tr>`;
+  const add = `model.global.functions[${fi}].pieces = model.global.functions[${fi}].pieces||[]; model.global.functions[${fi}].pieces.push({x:'',y:''}); showContent('functions'); autoSave();`;
+  return `
+  <div class="section-title">Pieces（t, f(t)）</div>
+  <div class="table-wrap">
+    <div class="table-head"><div class="table-title">piecewise</div>
+      <div class="table-actions"><button onclick="${add}">＋行追加</button></div></div>
+    <table class="table"><thead><tr><th>t</th><th>f(t)</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+  </div>`;
+}
+function addFunction(type){
+  if(type==='Analytic'){
+    model.global.functions.push({tag:newTag('fn'),fname:'f_analytic',args:'x',expr:'sin(x)',unit:'',type:'Analytic'});
+  }else{
+    model.global.functions.push({tag:newTag('fn'),fname:'f_piece',args:'t',type:'Piecewise',unit:'',pieces:[]});
+  }
+  showContent('functions'); autoSave();
+}
+
+// 共有テーブル
+function tableSimple(contentId, prefix, columns, rows, onChange, onAdd, isImp){
   const head = columns.map(c=>`<th>${c.label}</th>`).join('')+'<th>Tag</th><th></th>';
   const body = rows.map((row,i)=>{
     const tds = columns.map(c=>{
       const val=row[c.key]??'';
       return `<td><input type="text" value="${val}" oninput="(${onChange})(modelPath('${contentId}')[${i}],'${c.key}',this.value)"></td>`;
     }).join('');
-    return `<tr>${tds}<td class="small">${row.tag||''}</td>
+    const trClass = isImp && isImp(row) ? ' class="imp-row"' : '';
+    const impBadge = isImp && isImp(row) ? '<span class="imp-badge">＊ 要統一</span>' : '';
+    return `<tr${trClass}>${tds}<td class="small">${row.tag||''}${impBadge}</td>
       <td><button class="row-del" onclick="modelPath('${contentId}').splice(${i},1);showContent('${contentId}');autoSave()">🗑</button></td></tr>`;
   }).join('') || `<tr><td colspan="${columns.length+2}" class="small">行がありません。「＋行追加」で追加。</td></tr>`;
   const addCall = `(${onAdd})();showContent('${contentId}')`;
@@ -497,59 +639,50 @@ function modelPath(id){
   return [];
 }
 
+// Geometry
 function renderGeometry(main){
   let html = panel('Geometry（comp1/geom1）');
-  html += `<div class="section-title">Features</div>
-    <div class="small">COMSOLの「Block 1 (blk1)」「Difference 1 (dif1)」のように、タイプ＋番号のタグを自動付与します。</div>
+  html += `<div class="section-title">形状パターン（概要）</div>`;
+  // パターン表
+  const headers = ['項目','リング数','周期','カット','解析パターン'];
+  const rows = (model.comp1.geometry.patterns||[]).map((p,i)=>{
+    const [r1,r2,r3,r4] = p.cols || ['','','',''];
+    return `<tr>
+      <td>${i+1}</td>
+      <td><input value="${r1?.split('=')[1]||''}" oninput="updateGeomPattern(${i},0,this.value)"></td>
+      <td><input value="${r2?.split('=')[1]||''}" oninput="updateGeomPattern(${i},1,this.value)"></td>
+      <td><input value="${r3?.split('=')[1]||''}" oninput="updateGeomPattern(${i},2,this.value)"></td>
+      <td><input value="${r4?.split('=')[1]||''}" oninput="updateGeomPattern(${i},3,this.value)"></td>
+    </tr>`;
+  }).join('');
+  html += `
+    <div class="table-wrap">
+      <div class="table-head"><div class="table-title">patterns</div></div>
+      <table class="table">
+        <thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="section-title">形状ごとの変更点チェック</div>
+    <div class="small" style="white-space:pre-line">${model.comp1.geometry.notes||''}</div>
     <div class="hr"></div>
-    <div class="table-actions" style="margin-bottom:8px">
-      ${addBtn('＋Blockを追加', "addGeom('Block')")}
-      ${addBtn('＋Cylinderを追加', "addGeom('Cylinder')")}
-      ${addBtn('＋Differenceを追加', "addGeom('Difference')")}
-    </div>`;
-  model.comp1.geometry.features.forEach((f,idx)=>{
-    html += `<div class="panel" style="border:1px solid #eaeef6">
-      <div class="panel-hd"><div class="panel-title">${f.name} <span class="badge">(${f.tag})</span></div></div>
-      <div class="panel-bd">
-        <div class="section-title">Parameters</div>
-        ${tableKV(`geom-${idx}`, f.params, (i,v)=>{ f.params[i]=v; autoSave(); }, ()=>{
-          f.params.push({k:'',v:'',u:''}); showContent('geometry');
-        })}
-        <div class="hr"></div>
-        <div class="small"><button class="row-del" onclick="model.comp1.geometry.features.splice(${idx},1);showContent('geometry');autoSave()">🗑 削除</button></div>
-      </div></div>`;
-  });
+    <div class="section-title">Features（詳細は必要時に追加）</div>
+    <div class="small">基本形状は同一のため省略中。必要に応じて「＋Block / +Cylinder / +Difference」で追加してください。</div>
+  `;
   html += panelEnd();
   main.innerHTML = html;
 }
-function addGeom(type){
-  const mapTag = {Block:'blk',Cylinder:'cyl',Difference:'dif'};
-  const tag = newTag(mapTag[type]||'blk');
-  model.comp1.geometry.features.push({tag,type,name:`${type} ${nextId[mapTag[type]]-1}`,params:[]});
-  showContent('geometry');
+function updateGeomPattern(i, col, val){
+  const keys = ['リング数','周期','カット','解析'];
+  const arr = model.comp1.geometry.patterns[i].cols||[];
+  arr[col] = `${keys[col]}=${val}`;
+  model.comp1.geometry.patterns[i].cols = arr;
   autoSave();
 }
-function tableKV(id, rows, onChange, onAdd){
-  const body = (rows||[]).map((r,i)=>`
-    <tr>
-      <td><input type="text" value="${r.k||''}" oninput="(${onChange})(${i}, {k:this.value,v:'${r.v||''}',u:'${r.u||''}'})"></td>
-      <td><input type="text" value="${r.v||''}" oninput="(${onChange})(${i}, {k:'${r.k||''}',v:this.value,u:'${r.u||''}'})"></td>
-      <td><input type="text" value="${r.u||''}" oninput="(${onChange})(${i}, {k:'${r.k||''}',v:'${r.v||''}',u:this.value})"></td>
-      <td><button class="row-del" onclick="${id.split('-')[0]==='geom'?'model.comp1.geometry.features['+id.split('-')[1]+'].params.splice('+i+',1)':''};showContent('geometry');autoSave()">🗑</button></td>
-    </tr>
-  `).join('') || `<tr><td colspan="4" class="small">行がありません。「＋行追加」で追加。</td></tr>`;
-  return `
-  <div class="table-wrap">
-    <div class="table-head"><div class="table-title">Key / Value / Unit</div>
-      <div class="table-actions"><button onclick="(${onAdd})()">＋行追加</button></div></div>
-    <table class="table"><thead><tr><th>Key</th><th>Value</th><th>Unit</th><th></th></tr></thead>
-      <tbody>${body}</tbody></table>
-  </div>`;
-}
 
+// Materials
 function renderMaterials(main){
   let html = panel('Materials（comp1/materials）');
-  html += `<div class="table-actions" style="margin-bottom:8px">${addBtn('＋材料ブロック追加',"addMaterial()")}</div>`;
   model.comp1.materials.forEach((m,idx)=>{
     html += `<div class="panel">
       <div class="panel-hd"><div class="panel-title">${m.name} <span class="badge">(${m.tag})</span></div>
@@ -558,6 +691,7 @@ function renderMaterials(main){
       <div class="panel-bd">
         <div class="kv"><label>表示名</label><input value="${m.name}" oninput="model.comp1.materials[${idx}].name=this.value;autoSave()"></div>
         <div class="kv"><label>Selection（ドメインID）</label><div>${chipsHTML(m.selection, v=>{m.selection=v;})}</div></div>
+        <div class="kv"><label>ノート</label><input value="${m.note||''}" oninput="model.comp1.materials[${idx}].note=this.value;autoSave()"></div>
         <div class="section-title">カスタム物性</div>
         ${tableGeneric(`mat-${idx}`, ['物性名','値/式','単位','備考'],
           (m.props||[]).map(p=>[p.prop,p.val,p.unit,p.note||'']),
@@ -570,19 +704,10 @@ function renderMaterials(main){
   html += panelEnd();
   main.innerHTML=html;
 }
-function addMaterial(){
-  model.comp1.materials.push({tag:newTag('mat'),name:`Material ${nextId.mat-1}`,active:true,selection:[],props:[]});
-  showContent('materials');
-  autoSave();
-}
 
+// Physics
 function renderPhysics(main){
   let html = panel('Physics（comp1）');
-  html += `<div class="table-actions" style="margin-bottom:8px">
-    ${addBtn('＋Magnetic Fields (mfh)',"addPhysics('mfh','Magnetic Fields')")}
-    ${addBtn('＋Electric Currents (ec)',"addPhysics('ec','Electric Currents')")}
-    ${addBtn('＋Heat Transfer (ht)',"addPhysics('ht','Heat Transfer')")}
-  </div>`;
   model.comp1.physics.forEach((p,idx)=>{
     html += `<div class="panel">
       <div class="panel-hd"><div class="panel-title">${p.name} <span class="badge">(${p.tag})</span></div>
@@ -591,6 +716,7 @@ function renderPhysics(main){
       <div class="panel-bd">
         <div class="kv"><label>表示名</label><input value="${p.name}" oninput="model.comp1.physics[${idx}].name=this.value;autoSave()"></div>
         <div class="kv"><label>Selection（領域/境界ID）</label><div>${chipsHTML(p.selection, v=>{p.selection=v;})}</div></div>
+        <div class="kv"><label>ノート</label><input value="${p.note||''}" oninput="model.comp1.physics[${idx}].note=this.value;autoSave()"></div>
         <div class="section-title">パラメータ</div>
         ${tableGeneric(`phys-${idx}`, ['項目','値/式','単位','備考'],
           (p.params||[]).map(q=>[q.k,q.v,q.u||'',q.note||'']),
@@ -603,21 +729,10 @@ function renderPhysics(main){
   html += panelEnd();
   main.innerHTML=html;
 }
-function addPhysics(type, name){
-  const tag = type + (nextId[type]++);
-  model.comp1.physics.push({tag,name,type,active:true,selection:[],params:[]});
-  showContent('physics');
-  autoSave();
-}
 
+// Mesh
 function renderMesh(main){
   let html = panel('Mesh（comp1/mesh1）');
-  html += `<div class="table-actions" style="margin-bottom:8px">
-    ${addBtn('＋Size', "addMesh('Size')")}
-    ${addBtn('＋Free Tetrahedral', "addMesh('Free Tetrahedral')")}
-    ${addBtn('＋Swept', "addMesh('Swept')")}
-    ${addBtn('＋Mapped', "addMesh('Mapped')")}
-  </div>`;
   model.comp1.mesh.features.forEach((f,idx)=>{
     html += `<div class="panel">
       <div class="panel-hd"><div class="panel-title">${f.name} <span class="badge">(${f.tag})</span></div>
@@ -638,21 +753,11 @@ function renderMesh(main){
   html += panelEnd();
   main.innerHTML=html;
 }
-function addMesh(type){
-  model.comp1.mesh.features.push({tag:newTag('mesh'),name:`${type} ${nextId.mesh-1}`,type,active:true,selection:[],params:[]});
-  showContent('mesh');
-  autoSave();
-}
 
+// Study
 function renderStudy(main){
   let html = panel('Study 1（std1）', model.study.tag);
-  html += `<div class="section-title">Steps</div>
-    <div class="table-actions" style="margin-bottom:8px">
-      ${addBtn('＋Stationary',"addStep('Stationary')")}
-      ${addBtn('＋Time Dependent',"addStep('Time Dependent')")}
-      ${addBtn('＋Frequency Domain',"addStep('Frequency Domain')")}
-      ${addBtn('＋Parametric Sweep',"addStep('Parametric Sweep')")}
-    </div>`;
+  html += `<div class="section-title">Steps</div>`;
   model.study.steps.forEach((s,idx)=>{
     html += `<div class="panel">
       <div class="panel-hd"><div class="panel-title">Step ${idx+1}: ${s.type} <span class="badge">(${s.tag})</span></div>
@@ -661,12 +766,10 @@ function renderStudy(main){
       <div class="panel-bd">
         ${s.type==='Time Dependent'?`
           <div class="kv"><label>時間設定（tlist）</label><input value="${(s.tlist||'')}" oninput="model.study.steps[${idx}].tlist=this.value;autoSave()" placeholder="t0:dt:t1 / range()"/></div>`:''}
-        ${s.type==='Frequency Domain'?`
-          <div class="kv"><label>周波数範囲</label><input value="${(s.frange||'')}" oninput="model.study.steps[${idx}].frange=this.value;autoSave()" placeholder="range(f0,df,f1)"/></div>`:''}
         ${s.type==='Parametric Sweep'?`
           <div class="kv"><label>Parameter</label><input value="${(s.param||'')}" oninput="model.study.steps[${idx}].param=this.value;autoSave()"></div>
-          <div class="kv"><label>Range/List</label><input value="${(s.range||'')}" oninput="model.study.steps[${idx}].range=this.value;autoSave()"></div>`:''}
-        <div class="section-title">その他パラメータ</div>
+          <div class="kv"><label>Range/List</label><input value="${(s.range||'')}" oninput="model.study.steps[${idx}].range=this.value;autoSave()" placeholder="range(...)/list"/></div>`:''}
+        <div class="section-title">その他パラメータ/備考</div>
         ${tableGeneric(`step-${idx}`, ['項目','値','備考'],
           (s.params||[]).map(q=>[q.k,q.v,q.note||'']),
           (r,c,val)=>{ const q=s.params[r]; const keys=['k','v','note']; q[keys[c]]=val; autoSave(); },
@@ -678,26 +781,24 @@ function renderStudy(main){
   html += panelEnd();
   main.innerHTML=html;
 }
-function addStep(type){
-  model.study.steps.push({tag:newTag('stp'),type,active:true,params:[],notes:''});
-  showContent('study');
-  autoSave();
-}
+
+// Solver
 function renderSolver(main){
   let html = panel('Solver / Convergence');
-  html += tableGeneric('solver', ['タイプ','線形ソルバー','非線形','前処理','RelTol','AbsTol','MaxIt'],
-    model.study.solver.map(s=>[s.type,s.lin,s.nonlin,s.precond,s.rel,s.abs,s.maxit]),
-    (r,c,v)=>{ const keys=['type','lin','nonlin','precond','rel','abs','maxit']; model.study.solver[r][keys[c]]=v; autoSave(); },
-    ()=>{ model.study.solver.push({type:'',lin:'',nonlin:'',precond:'',rel:'',abs:'',maxit:''}); showContent('solver'); autoSave(); },
+  html += tableGeneric('solver', ['タイプ','線形ソルバー','非線形','前処理','RelTol','AbsTol','MaxIt','備考'],
+    model.study.solver.map(s=>[s.type,s.lin,s.nonlin,s.precond,s.rel,s.abs,s.maxit,s.notes||'']),
+    (r,c,v)=>{ const keys=['type','lin','nonlin','precond','rel','abs','maxit','notes']; model.study.solver[r][keys[c]]=v; autoSave(); },
+    ()=>{ model.study.solver.push({type:'',lin:'',nonlin:'',precond:'',rel:'',abs:'',maxit:'',notes:''}); showContent('solver'); autoSave(); },
     r=>{ model.study.solver.splice(r,1); showContent('solver'); autoSave(); }
   );
   html += panelEnd();
   main.innerHTML=html;
 }
 
+// Results
 function renderResults(main){
   let html = panel('Results：Datasets / Plot Groups');
-
+  // Datasets
   html += `<div class="section-title">Datasets</div>
     <div class="table-actions" style="margin-bottom:8px">${addBtn('＋Dataset追加',"addDataset()")}</div>`;
   model.results.datasets.forEach((d,idx)=>{
@@ -710,7 +811,7 @@ function renderResults(main){
         <div class="small"><button class="row-del" onclick="model.results.datasets.splice(${idx},1);showContent('results');autoSave()">🗑 Dataset削除</button></div>
       </div></div>`;
   });
-
+  // Plot Groups
   html += `<div class="section-title">Plot Groups</div>
     <div class="table-actions" style="margin-bottom:8px">${addBtn('＋Plot Group追加',"addPlotGroup()")}</div>`;
   model.results.plotGroups.forEach((pg,idx)=>{
@@ -746,23 +847,11 @@ function renderResults(main){
   html += panelEnd();
   main.innerHTML=html;
 }
-function addDataset(){
-  model.results.datasets.push({tag:newTag('dset'),name:`Solution ${nextId.dset-1}`,fromStudy:model.study.tag,note:''});
-  showContent('results');
-  autoSave();
-}
-function addPlotGroup(){
-  const d = model.results.datasets[0]?.tag;
-  model.results.plotGroups.push({tag:newTag('pg'),name:`3D Plot Group ${nextId.pg-1}`,datasetTag:d,plots:[]});
-  showContent('results');
-  autoSave();
-}
-function addPlot(pgIndex){
-  model.results.plotGroups[pgIndex].plots.push({tag:newTag('plt'),type:'Surface',selection:[],expr:'',unit:'',note:''});
-  showContent('results');
-  autoSave();
-}
+function addDataset(){ model.results.datasets.push({tag:newTag('dset'),name:`Solution ${nextId.dset}`,fromStudy:model.study.tag,note:''}); showContent('results'); autoSave(); }
+function addPlotGroup(){ const d = model.results.datasets[0]?.tag; model.results.plotGroups.push({tag:newTag('pg'),name:`3D Plot Group ${nextId.pg}`,datasetTag:d,plots:[]}); showContent('results'); autoSave(); }
+function addPlot(pgIndex){ model.results.plotGroups[pgIndex].plots.push({tag:newTag('plt'),type:'Surface',selection:[],expr:'',unit:'',note:''}); showContent('results'); autoSave(); }
 
+// Derived
 function renderDerived(main){
   let html = panel('Derived Values');
   html += `<div class="table-actions" style="margin-bottom:8px">${addBtn('＋Derived追加',"addDerived()")}</div>`;
@@ -781,12 +870,9 @@ function renderDerived(main){
   html += panelEnd();
   main.innerHTML=html;
 }
-function addDerived(){
-  model.results.derived.push({tag:newTag('plt'),name:`Derived ${nextId.plt-1}`,type:'Line Average',selection:[],expr:'',note:''});
-  showContent('derived');
-  autoSave();
-}
+function addDerived(){ model.results.derived.push({tag:newTag('plt'),name:`Derived ${nextId.plt}`,type:'Line Average',selection:[],expr:'',note:''}); showContent('derived'); autoSave(); }
 
+// テーブル共通
 function tableGeneric(id, headers, rows, onCell, onAdd, onDel){
   const head = headers.map(h=>`<th>${h}</th>`).join('') + '<th></th>';
   const body = rows.length? rows.map((r,ri)=>`
