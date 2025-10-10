@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMSOL初期設定チェックリスト（A4 1枚版）</title>
+<style>
+  /* ---- ベース ---- */
+  @page { size: A4 portrait; margin: 6mm; }  /* 余白を小さく */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 210mm; height: 297mm; }
+  body {
+    font-family: 'Segoe UI','Yu Gothic','Meiryo',sans-serif;
+    font-size: 7pt;                  /* 全体を小さめに */
+    line-height: 1.25;               /* 行間タイト */
+    background: #0f172a;
+    color: #1e293b;
+  }
+  .container {
+    background: white;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.25);
+  }
+
+  /* ---- ヘッダ ---- */
+  header {
+    background: linear-gradient(135deg,#1e293b 0%,#334155 100%);
+    color: white;
+    padding: 5mm 5mm 4mm 5mm;     /* 低めのパディング */
+    border-bottom: 2px solid #3b82f6;
+  }
+  h1 {
+    font-size: 13pt;              /* 見出しも少し縮小 */
+    font-weight: 700;
+    letter-spacing: .3px;
+  }
+  .subtitle {
+    font-size: 7pt;
+    opacity: .9;
+    margin-top: 1.5mm;
+  }
+
+  /* ---- コンテンツ ---- */
+  .content { padding: 4mm 5mm; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2mm;                     /* カード間の隙間を圧縮 */
+    margin-bottom: 0;
+  }
+  .section { break-inside: avoid; }
+  .full-width { grid-column: 1 / -1; }
+
+  /* ---- セクション見出し ---- */
+  h2 {
+    font-size: 9pt;
+    font-weight: 700;
+    margin-bottom: 1.5mm;
+    padding: 1.5mm 2mm;
+    background: #1e293b;
+    color: #fff;
+    border-radius: 3px;
+    display: flex; align-items: center; gap: 1.5mm;
+    border-left: 4px solid #3b82f6;
+  }
+  h2::before { content:''; width:3px; height:3px; background:#3b82f6; border-radius:50%; }
+  h3 {
+    font-size: 7.5pt; font-weight: 600;
+    margin: 1.5mm 0 1mm 0; padding: 1mm 2mm;
+    background: #334155; color:#fff; border-radius: 3px; border-left: 3px solid #3b82f6;
+    display: inline-block;
+  }
+
+  /* ---- テーブル ---- */
+  table {
+    width: 100%;
+    border-collapse: collapse;     /* 分離→結合で高さを節約 */
+    table-layout: fixed;           /* 折返しで高さを安定 */
+    font-size: 6pt;                /* テーブルはさらに小さめ */
+    margin-bottom: 1.5mm;
+    border: 1px solid #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  th, td { padding: 1.2mm 1.6mm; word-break: break-word; }
+  th {
+    background: #1e293b; color:#fff; font-weight:600; font-size: 6.3pt; letter-spacing:.2px;
+  }
+  td { border-top: 0.5pt solid #e2e8f0; background: #fff; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .compact {
+    margin: 1mm 0 0.8mm 1mm; padding: 1.2mm 1.6mm;
+    background: #f8fafc; border-left: 3px solid #3b82f6; border-radius: 0 3px 3px 0;
+    font-size: 6.6pt; line-height: 1.35;
+  }
+
+  /* ---- 重要行のマーク ---- */
+  .important { position: relative; }
+  .important td:first-child::before {
+    content:'⚡'; position:absolute; left: 0.5mm; font-size: 7pt; color:#3b82f6;
+  }
+  .important td:first-child { padding-left: 4.5mm; font-weight: 700; color:#1e40af; }
+
+  /* ---- バッジ & メモ ---- */
+  .badge {
+    display: inline-block; padding: .5mm 1.5mm; background:#3b82f6; color:#fff;
+    border-radius: 3px; font-size: 6pt; font-weight: 700; margin-left: 1.5mm;
+  }
+  .note {
+    background:#1e293b; color:#fff; padding: 1.8mm 2mm; margin-top: 2mm;
+    border-radius: 3px; border-left: 4px solid #ef4444; font-size: 6.6pt; line-height: 1.4;
+  }
+  .note strong { display:block; font-size: 7.3pt; margin-bottom: 1mm; letter-spacing: .3px; }
+  .note-item { display:flex; align-items:flex-start; gap:1.2mm; margin: .8mm 0; }
+  .note-item::before { content:'▶'; font-size: 6pt; margin-top: .2mm; flex-shrink: 0; }
+
+  /* ---- ジオメトリカード ---- */
+  .geometry-grid {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 1.2mm; margin: 1.5mm 0 1mm;
+  }
+  .geo-card {
+    background:#fff; padding: 1.2mm; border-radius: 3px; text-align:center; font-size: 6pt;
+    border: 1px solid #e2e8f0;
+  }
+  .geo-card strong { display:block; font-size: 7pt; margin-bottom: .6mm; color:#2d3748; }
+  .geo-detail { font-size: 5.7pt; color:#475569; }
+
+  /* ---- 印刷用最適化 ---- */
+  @media print {
+    body { background: white; }
+    .container { box-shadow: none; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    /* さらに圧縮（印刷時のみ微調整） */
+    body { font-size: 6.8pt; line-height: 1.22; }
+    h1 { font-size: 12pt; }
+    h2 { font-size: 8.6pt; padding: 1.2mm 1.8mm; }
+    h3 { font-size: 7.2pt; padding: .8mm 1.8mm; }
+    th, td { padding: 1mm 1.4mm; }
+    .geometry-grid { gap: 1mm; }
+    .note { padding: 1.5mm 1.8mm; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>⚡ COMSOL 初期設定チェックリスト</h1>
+      <div class="subtitle">シミュレーション設定完全ガイド | 2025</div>
+    </header>
+
+    <div class="content">
+      <div class="grid">
+        <!-- 1. パラメータ -->
+        <div class="section full-width">
+          <h2>1. パラメータ設定</h2>
+          <table>
+            <tr>
+              <th style="width:25%">名前</th>
+              <th style="width:18%">数値</th>
+              <th style="width:12%">単位</th>
+              <th style="width:45%">説明</th>
+            </tr>
+            <tr><td>gap</td><td>4</td><td>mm</td><td>バルク間距離</td></tr>
+            <tr><td>radius_bulk</td><td>15</td><td>mm</td><td>バルク直径</td></tr>
+            <tr><td>thickness_bulk</td><td>5</td><td>mm</td><td>バルク厚み</td></tr>
+            <tr><td>lambda</td><td>10</td><td>mm</td><td>周期長</td></tr>
+            <tr><td>magnetization_time/relaxation_time</td><td>1000</td><td>s</td><td>磁化時間</td></tr>
+            <tr class="important"><td>Dy2</td><td>1</td><td>mm</td><td>リング直線部y方向長さ【統一必須】</td></tr>
+            <tr class="important"><td>J_c_param</td><td>10</td><td>kA/mm²</td><td>臨界電流密度【統一必須】</td></tr>
+            <tr class="important"><td>Bs</td><td>5</td><td>T</td><td>外部磁場【統一必須】</td></tr>
+            <tr><td>Bs_min / Bs_max</td><td>-5 / 5</td><td>T</td><td>磁場範囲</td></tr>
+          </table>
+        </div>
+
+        <!-- 2. 変数 -->
+        <div class="section">
+          <h2>2. 変数</h2>
+          <table>
+            <tr><th>名前</th><th>値/式</th></tr>
+            <tr class="important"><td>n</td><td>21</td></tr>
+            <tr><td>E_c</td><td>0.0001 V/m</td></tr>
+            <tr><td>rho_AIR</td><td>1 Ω·m</td></tr>
+            <tr class="important"><td>H_ext</td><td>int2(t)/mu0</td></tr>
+            <tr><td>J_c</td><td>J_c_param</td></tr>
+          </table>
+        </div>
+
+        <!-- 3. 関数 -->
+        <div class="section">
+          <h2>3. 関数</h2>
+          <h3>int2(t)※Jc,Dy2の解析</h3>
+          <p class="compact">(0, -Bs) → (magnetization_time, Bs) → (magnetization_time+relaxation_time, Bs)</p>
+          <h3>int3(t)※ヒステリシス解析</h3>
+          <p class="compact">(0, (Bs_max+Bs_min)/2) → (1000, Bs_max) → (2000, (Bs_max+Bs_min)/2) → (3000, Bs_min) → (4000, (Bs_max+Bs_min)/2) → (5000, Bs_max)</p>
+        </div>
+
+        <!-- 4. ジオメトリ -->
+        <div class="section full-width">
+          <h2>4. ジオメトリパターン<span class="badge">6パターン</span></h2>
+          <div class="geometry-grid">
+            <div class="geo-card"><strong>P1</strong><div class="geo-detail">リング2 | 周期1 | カット×</div></div>
+            <div class="geo-card"><strong>P2</strong><div class="geo-detail">リング2 | 周期1 | カット○</div></div>
+            <div class="geo-card"><strong>P3</strong><div class="geo-detail">リング2 | 周期0.5 | カット×</div></div>
+            <div class="geo-card"><strong>P4</strong><div class="geo-detail">リング2 | 周期0.5 | カット○</div></div>
+            <div class="geo-card"><strong>P5</strong><div class="geo-detail">リング1 | 周期1 | カット×</div></div>
+            <div class="geo-card"><strong>P6</strong><div class="geo-detail">リング1 | 周期1 | カット○</div></div>
+          </div>
+          <p class="compact"><strong>カット○:</strong> ポリゴン3.7点y座標変更 | <strong>周期0.5:</strong> 線分λ/2, 座標(0,0,0) | <strong>周期1:</strong> 線分λ, 座標(0,0,±λ/4)</p>
+        </div>
+
+        <!-- 5. 材料 -->
+        <div class="section">
+          <h2>5. 材料</h2>
+          <table>
+            <tr><th>材料</th><th>ドメイン</th></tr>
+            <tr><td>AIR</td><td>全部*</td></tr>
+            <tr><td>SC1</td><td>バルク</td></tr>
+            <tr><td>SC2</td><td>リング</td></tr>
+          </table>
+        </div>
+
+        <!-- 6. 境界条件 -->
+        <div class="section">
+          <h2>6. 境界条件</h2>
+          <table>
+            <tr><th>名前</th><th>領域</th></tr>
+            <tr><td>AIR</td><td>表面</td></tr>
+            <tr><td>M_insu</td><td>断面</td></tr>
+            <tr><td>SC</td><td>バルク+リング</td></tr>
+            <tr><td>M_field</td><td>非断面</td></tr>
+          </table>
+        </div>
+
+        <!-- 7. メッシュ -->
+        <div class="section">
+          <h2>7. メッシュ</h2>
+          <table>
+            <tr><th>パーツ</th><th>タイプ</th><th>サイズ</th></tr>
+            <tr><td>ビーム</td><td>Mapped</td><td>横1, 縦2</td></tr>
+            <tr><td>ビーム</td><td>Swept</td><td>50</td></tr>
+            <tr><td>バルク</td><td>SC</td><td>0.001m</td></tr>
+            <tr><td>リング</td><td>SC1</td><td>0.001m</td></tr>
+            <tr><td>空気</td><td>AIR</td><td>残り</td></tr>
+          </table>
+        </div>
+
+        <!-- 8. スタディ -->
+        <div class="section">
+          <h2>8. スタディ</h2>
+          <table>
+            <tr><th>名前</th><th>種類</th><th>レンジ</th><th>パターン</th></tr>
+            <tr><td>Jc</td><td>Parametricsweap<br>TimeDependent</td><td>(0,(ma+re)/100,ma+re)</td><td>8</td></tr>
+            <tr><td>Dy2</td><td>Parametricsweap<br>TimeDependent</td><td>(0,(ma+re)/100,ma+re)</td><td>9</td></tr>
+            <tr><td>Bs</td><td>TimeDependent</td><td>(0,Bs_time/50,Bs_time)</td><td>5*</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- 注意事項 -->
+      <div class="note">
+        <strong>⚠️ 重要チェック項目</strong>
+        <div class="note-item">時間ステッピング: 非線形コントローラーON</div>
+        <div class="note-item">強連性を「直接」に設定</div>
+        <div class="note-item">残差スケーリングを「マニュアル」に設定</div>
+        <div class="note-item">AIR材料ドメイン: 全部 or 2,3除外を確認</div>
+        <div class="note-item">値変えながら5回スタディ、int3を使用</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
